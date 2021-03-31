@@ -11,6 +11,11 @@
     <modules>
         <module>01-operators</module>
         <module>21-concurrent</module>
+        <module>15-lambda</module>
+        <module>11-interface</module>
+        <module>09-extend</module>
+        <module>50-datastructure</module>
+        <module>51-algorithm</module>
     </modules>
 
     <properties>
