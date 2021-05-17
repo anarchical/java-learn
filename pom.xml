@@ -11,15 +11,15 @@
     <modules>
         <module>01-variable</module>
         <module>02-operator</module>
+        <module>03-control-flow</module>
         <module>04-array</module>
         <module>05-class</module>
-        <module>09-extend</module>
+        <module>06-extend</module>
         <module>11-interface</module>
         <module>15-lambda</module>
         <module>21-concurrent</module>
         <module>50-data-structure</module>
         <module>51-algorithm</module>
-        <module>03-control-flow</module>
 
     </modules>
 
