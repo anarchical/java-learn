@@ -1,10 +1,12 @@
+package example;
+
 /**
  * @author YeYaqiao
  */
 public class Son extends Father {
 
     public Son() {
-        System.out.println("Son init");
+        System.out.println("example.Son init");
     }
 
     public void sonMethod() {

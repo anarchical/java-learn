@@ -1,10 +1,12 @@
+package example;
+
 /**
  * @author YeYaqiao
  */
 public class Father extends Grandpa {
 
     public Father() {
-        System.out.println("Father init");
+        System.out.println("example.Father init");
     }
 
     public void fatherMethod(){
