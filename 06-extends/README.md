@@ -9,15 +9,15 @@
 ```java
 public class Son extends Father {
 
-    public static void main(String[] args) {
-        Son son = new Son();
-    }
+   public static void main(String[] args) {
+      Son son = new Son();
+   }
 }
 
 class Father {
-    public Father() {
-        System.out.println("father");
-    }
+   public Father() {
+      System.out.println("father");
+   }
 }
 ```
 
@@ -30,7 +30,7 @@ class Father {
 
 #### 常见问题
 
-1. 如何判断一个勒种有没有构造器？
+1. 如何判断一个类有没有构造器？
 
    反射机制
 
