@@ -9,7 +9,7 @@ public class Music {
     }
 }
 
-class Test {
+class TestMusic {
     public static void main(String[] args) {
         Music music = new Music();
 
