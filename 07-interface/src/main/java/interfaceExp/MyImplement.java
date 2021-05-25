@@ -1,16 +1,16 @@
 package interfaceExp;
 
+import family.Father;
+
 /**
  * @author YeYaqiao
  */
 public class MyImplement implements MyInterface {
 
-
     @Override
     public void abstractMethod() {
         System.out.println("实现了抽象方法");
     }
-
 
     public static void main(String[] args) {
         MyInterface myInterface = new MyImplement();
@@ -19,5 +19,4 @@ public class MyImplement implements MyInterface {
 
         System.out.println(MyInterface.staticMethod());
     }
-
 }
