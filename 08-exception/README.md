@@ -70,8 +70,6 @@ RuntimeException-->NoSuchMethodException
 RuntimeException-->NumberFormatException
 ```
 
-* Runtime
-
 #### throw 和 throws
 
 Java 有三种处理异常的方式
