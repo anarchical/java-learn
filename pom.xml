@@ -21,6 +21,8 @@
         <module>21-concurrent</module>
         <module>50-data-structure</module>
         <module>51-algorithm</module>
+        <module>08-exception</module>
+        <module>09-concurrent</module>
 
     </modules>
 
