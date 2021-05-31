@@ -7,7 +7,7 @@ package sync;
  */
 public class MyNotSync implements Runnable {
 
-    private static int num = 0;
+    private static int num = 0;//共享资源
 
     @Override
     public void run() {
@@ -26,5 +26,4 @@ public class MyNotSync implements Runnable {
             thread.start();
         }
     }
-
 }

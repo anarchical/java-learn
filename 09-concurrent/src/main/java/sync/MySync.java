@@ -4,6 +4,7 @@ package sync;
  * @author YeYaqiao
  * 线程同步示例，使用 synchronized 关键字锁住共享任务 run()
  * 当失去 CPU 资源时其他线程不能执行插入执行被 synchronized 关键字修饰的代码块
+ * synchronized 只能修饰 方法、静态方法、类、代码块 这四种
  */
 public class MySync implements Runnable {
 
@@ -15,7 +16,6 @@ public class MySync implements Runnable {
         System.out.println(Thread.currentThread().getName() + "是第" + num + "个访问的线程");
     }
 
-
     public static void main(String[] args) {
 
         //多个线程共享 mySync 任务
@@ -26,5 +26,4 @@ public class MySync implements Runnable {
             thread.start();
         }
     }
-
 }

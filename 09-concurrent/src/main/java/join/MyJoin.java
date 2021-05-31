@@ -6,7 +6,6 @@ package join;
  */
 public class MyJoin implements Runnable {
 
-
     @Override
     public void run() {
 
@@ -32,7 +31,5 @@ public class MyJoin implements Runnable {
             //一开始交替运行，后来被阻塞直到 thread 线程执行完，获得 CPU 后继续运行
             System.out.println("main 线程执行：" + i);
         }
-
     }
-
 }

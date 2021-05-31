@@ -27,8 +27,6 @@ public class MyYield implements Runnable {
                 Thread.yield();
             }
             System.out.println("main 线程执行：" + i);
-
         }
-
     }
 }
