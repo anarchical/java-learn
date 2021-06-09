@@ -60,6 +60,5 @@ public class MyDeadlock implements Runnable {
         new Thread(myDeadlock1, "哲学家1号").start();
         new Thread(myDeadlock2, "哲学家2号").start();
 
-
     }
 }

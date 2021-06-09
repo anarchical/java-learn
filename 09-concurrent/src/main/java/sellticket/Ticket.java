@@ -9,19 +9,18 @@ import java.util.concurrent.TimeUnit;
 public class Ticket {
 
     //剩余球票
-    private int surpluCount = 15;
+    private int surpluCount = 10000;
     //已售出球票
     private int outCount = 0;
 
     public void sell() {
+        try {
+            TimeUnit.MILLISECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         synchronized (Ticket.class){
             while (surpluCount > 0) {
-
-                try {
-                    TimeUnit.MILLISECONDS.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
                 if (surpluCount == 0) {
                     return;
@@ -40,5 +39,11 @@ public class Ticket {
 
     }
 
+    public static void main(String[] args) {
+        Ticket ticket=new Ticket();
+
+        new Thread(ticket::sell,"线程1").start();
+        new Thread(ticket::sell,"线程2").start();
+    }
 
 }

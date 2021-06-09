@@ -81,7 +81,7 @@
 
    启动线程需要调用 Thread 类的 start() 方法，而不是 run() 方法，start() 表示线程的启动，是 Thread 类的，而 run() 是 Runnable 接口中的，表示任务的执行，单独使用 run() 不会使线程去争夺 CPU 资源
 
-3. 实现 Callable 接口
+3. 实现 Callable 接口，重写 call 方法
 
    ```java
    public class MyCallable implements Callable {
@@ -104,7 +104,7 @@
    }
    ```
 
-   Callable 接口与 Runnable 接口的区别在于：Callable 可以有返回值，可以抛出异常
+   Callable 接口与 Runnable 接口的区别在于：Callable 可以有返回值；可以抛出异常；Callable 需要 FutureTask 包装（FutureTask 实现了 RunnableFuture 的接口，RunnableFuture 又继承了 Runnable 接口）
 
 #### 线程的五个状态
 
@@ -134,8 +134,8 @@ graph LR
    阻塞状态是线程因为某种原因放弃CPU使用权限，暂时停止运行。直到线程进入就绪状态，才有机会进入运行状态。阻塞的三种情况：
 
     1. 等待阻塞，通过调用线程的wait()方法，让线程等待某工作的完成
-    2. 线程在获取synchronized同步锁失败（因为锁被其他线程占用），它会进入同步阻塞状态。
-    3. 通过调用线程的sleep()或join()或发出了I/O请求时，线程会进入到阻塞状态。当sleep()状态超时、join()等待线程终止或超时、或者I/O处理完毕时，线程重新转入就绪状态。
+    2. 同步阻塞，线程在获取synchronized同步锁失败（因为锁被其他线程占用）
+    3. 其它阻塞，通过调用线程的sleep()或join()或发出了I/O请求时，线程会进入到阻塞状态。当sleep()状态超时、join()等待线程终止或超时、或者I/O处理完毕时，线程重新转入就绪状态。
 
 5. **死亡状态（Dead）**
    线程执行完了或因异常退出了run()方法，该线程结束生命周期。
@@ -148,7 +148,7 @@ graph LR
 
   使当前线程休眠，进入阻塞状态，让出CPU给其它线程，不释放锁，休眠时间到返回到就绪状态
 
-  sleep() 是一个 static native 静态本地方法
+  sleep() 是 Thread 类的一个 static native 静态本地方法
 
 * **join()** （线程合并）
 
@@ -189,9 +189,9 @@ graph LR
 
 * **yield()** （线程礼让）
 
-  当前线程暂停抢占 CPU 资源 ，让给相同优先级的线程执行，不释放锁，线程会直接转为就绪状态
+  当前线程暂停抢占 CPU 资源 ，让给相同优先级或更高优先级的线程执行，不释放锁，线程会直接转为就绪状态
 
-  yield() 是一个 static native 静态本地方法
+  yield() 是Thread 类的一个 static native 静态本地方法
 
   ```java
   public class MyYield implements Runnable {
@@ -218,6 +218,101 @@ graph LR
               }
               System.out.println("main 线程执行：" + i);
           }
+      }
+  }
+  ```
+
+* **wait()** （线程等待）
+
+  执行对象的 wait() 方法，会释放占用当前对象的线程的锁标记，存入对象的等待池中，进入阻塞状态，直到 wait() 超时或者其它线程调用资源的notify()、notifyAll()；
+
+  线程执行对象的 wait() 方法时，必须拥有当前对象的锁，否则会抛出 `IllegalMonitorStateException`异常；所以 wait() 肯定是在同步代码块中
+
+  wait() 是 Object 类的一个 final 普通方法（防止被重写）
+
+  ```java
+  public class MyWait {
+  
+      public synchronized void run(int i) {
+  
+          if (i == 5) {
+              try {
+                  this.wait();
+              } catch (InterruptedException e) {
+                  e.printStackTrace();
+              }
+          }
+          try {
+              TimeUnit.SECONDS.sleep(1);
+          } catch (InterruptedException e) {
+              e.printStackTrace();
+          }
+          System.out.println("run: " + i);
+      }
+      
+      public static void main(String[] args) {
+  
+          MyWait myWait = new MyWait();
+          new Thread(() -> {
+              for (int i = 0; i < 10; i++) {
+                  myWait.run(i);
+              }
+          }).start();
+      }
+  
+  }
+  ```
+
+* **notify() & notifyAll()**
+
+  当线程调用了对象的 notify() 方法，则会随机唤醒一个处于该对象的等待池中的线程
+
+  notifyAll() 会唤醒该对象等待池中所以的对象；重新进入就绪状态等待获取 CPU 资源和对象锁
+
+  notify() 容易造成死锁，因为 notify() 只能唤醒一个线程，而这个线程执行完毕后并没有唤醒其它在等待池中的线程，就会造成所有线程都处于一个等待的状态，造成死锁
+
+  ```java
+  public class MyNotify {
+  
+      public synchronized void run(int i) {
+  
+          if (i == 6) {
+              try {
+                  this.wait();
+              } catch (InterruptedException e) {
+                  e.printStackTrace();
+              }
+          }
+          try {
+              TimeUnit.SECONDS.sleep(1);
+          } catch (InterruptedException e) {
+              e.printStackTrace();
+          }
+          System.out.println("run: " + i);
+      }
+  
+      public synchronized void notifyRun() {
+          this.notify();
+      }
+  
+      public static void main(String[] args) {
+  
+          MyNotify myNotify = new MyNotify();
+          
+          new Thread(() -> {
+              for (int i = 0; i < 10; i++) {
+                  myNotify.run(i);
+              }
+          }).start();
+  
+          new Thread(() -> {
+              try {
+                  TimeUnit.SECONDS.sleep(8);
+              } catch (InterruptedException e) {
+                  e.printStackTrace();
+              }
+              myNotify.notifyRun();
+          }).start();
       }
   }
   ```
@@ -291,7 +386,7 @@ graph LR
 
 `synchronized` 是 Java 中的一个关键字，是一种同步锁，用来修饰需要同步的资源，可以用来修饰以下：
 
-* **代码块**，作用于调用这个代码块的对象
+* **代码块**， `synchronized(Object) { }` ，取决于 Object 的性质；
 * **方法**，作用于调用这个方法的对象
 * **静态方法**，作用于这个类的所有对象
 * **类**，作用于这个类的所有对象
@@ -304,11 +399,178 @@ graph LR
 注意问题：
 
 1. synchronized 不能用来修饰：静态变量、局部变量、静态代码块、接口、抽象方法
-
 2. synchronized 不能被继承，子类中需要的话需要重新声明
 
-   
+##### 死锁
+
+死锁产生的四个必要条件
+
+1. 互斥使用：当资源被一个线程使用(占有)时，别的线程不能使用。
+2. 不可抢占：资源请求者不能强制从资源占有者手中夺取资源，资源只能由资源占有者主动释放。
+3. 请求和保持：即当资源请求者在请求其他的资源的同时保持对原有资源的占有。
+4. 循环等待：即存在一个等待队列：P1占有P2的资源，P2占有P3的资源，P3占有P1的资源。这样就形成了一个等待环路。
+
+哲学家就餐问题，n 个人，n 根筷子，每个人有两根筷子才能吃饭，若每个人同时只获得一根筷子，则互相等待造成死锁
+
+```java
+public class MyDeadlock implements Runnable {
+
+    //筷子编号
+    private final int num;
+
+    //筷子资源，用 static 修饰，类变量，表示各有一份
+    private static final Object chopsticks1 = new Object();
+    private static final Object chopsticks2 = new Object();
+
+    //构造函数，指定哪个哲学家先拿到哪只筷子
+    public MyDeadlock(int num) {
+        this.num = num;
+    }
+
+    //num = 1 时，拿到 chopsticks1，等待 chopsticks2
+    //num = 2 时，拿到 chopsticks2，等待 chopsticks1
+    @Override
+    public void run() {
+
+        if (num == 1) {
+            System.out.println(Thread.currentThread().getName() + "拿到了 chopsticks1，等待 chopsticks2");
+            synchronized (chopsticks1) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (chopsticks2) {
+                    System.out.println(Thread.currentThread().getName() + "用餐完毕！");
+                }
+            }
+        }
+        if (num == 2) {
+            System.out.println(Thread.currentThread().getName() + "拿到了 chopsticks2，等待 chopsticks1");
+            synchronized (chopsticks2) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (chopsticks1) {
+                    System.out.println(Thread.currentThread().getName() + "用餐完毕！");
+                }
+            }
+        }
+
+    }
+
+    public static void main(String[] args) {
+
+        MyDeadlock myDeadlock1 = new MyDeadlock(1);
+        MyDeadlock myDeadlock2 = new MyDeadlock(2);
+
+        new Thread(myDeadlock1, "哲学家1号").start();
+        new Thread(myDeadlock2, "哲学家2号").start();
+
+    }
+}
+```
 
 
+
+##### 重入锁（ReentrantLock）
+
+ReentrantLock 是 对 synchronized 的升级
+
+ReentrantLock 通过 new 关键字创建，
+
+区别：
+
+* synchronized 是关键字；基于 JVM 实现；添加关键字自动上锁，上锁部分执行完毕后自动释放锁；可以锁定方法或代码块；synchronized 不可被中断
+* ReentrantLock 是 JDK 实现的类；在 java.util.concurrent 包下；可以多次上锁、解锁；可以设置等待时间；只能锁定代码块；可以使用 lockInterruptibly() 方法中断锁
+
+买票案例
+
+```java
+public class MyTicket implements Runnable {
+
+    //剩余票数
+    private int ticketCount = 20000;
+    //卖出票数
+    private int selledCount = 0;
+
+    private final Lock lock = new ReentrantLock();
+
+    @Override
+    public void run() {
+
+        while (ticketCount > 0) {
+            lock.lock();//锁定 开始卖出一张票
+
+            if (ticketCount == 0)//判断一下余票数量，若不为0则售票员线程开始卖票
+                return;
+            ticketCount--;
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            selledCount++;
+            System.out.printf("%s卖出了第%s张票\n", Thread.currentThread().getName(), selledCount);
+
+            lock.unlock();// 一张票卖完，解锁
+        }
+
+    }
+
+    public static void main(String[] args) {
+
+        MyTicket myTicket = new MyTicket();
+
+        Thread sell01 = new Thread(myTicket);
+        sell01.setName("售票员1号");
+        Thread sell02 = new Thread(myTicket);
+        sell02.setName("售票员2号");
+
+        sell01.start();
+        sell02.start();
+    }
+}
+```
+
+#### JUC 并发编程
+
+java.util.concurrent 中存放了 Java 并发编程的相关的 API
+
+并发编程可以充分利用 CPU 的资源，将计算机的性能发挥到极致
+
+* 垂直扩展：提高单机处理能力（更换性能更好的 CPU，增加 CPU 核心数、提升内存等）
+
+* 水平扩展：增加机器数量（分布式、集群）
+
+  集群：每台机器所处理的任务都相同，通过增加服务器的数量来提高并发能力
+
+  分布式：将整个系统拆分成不同的模块，交给不同的服务器来运行
+
+1. `CopyOnWriteArrayList` 写时复制
+
+   每次向容器中添加元素时，现将原来的容器
+
+2. `CountDownLatch` 减法计数器
+
+3. `CyclicBarrier`加法计数器
+
+4. `Semaphore` 计数信号量
+
+   限制访问资源的线程数量；初始化、获取许可、释放许可
+
+#### 常见问题
+
+1. wait()、 sleep()、yield() 的区别
+    * wait() 属于 Object 中的方法；执行对象 wait() 的线程会释放占用的对象和 CPU 资源，并进入阻塞状态，直到 wait() 超时或其它线程调用 notify() 或 notifyAll() 方法才能重新进入就绪状态等待执行
+    * sleep() 属于 Thread 中的方法；作用于占用此对象的当前线程；使当前线程阻塞指定的时间并释放 CPU 资源，同时不会释放占用当前对象的锁，使得其它需要此对象的线程只能等待
+    * yield() 属于 Thread 中的方法；使当前线程暂停执行并释放 CPU 资源，转为就绪状态，不释放锁；相同或更高优先级的线程可以抢占 CPU 资源
+2. synchronized 锁定的到底是什么？
+    * 若 synchronized 修饰的是非静态方法，则锁定的是调用此方法的当前对象
+    * 若 synchronized 修饰的是静态方法，则锁定的是调用此方法的所有对象
+    * 若 synchronized 修饰的是类，则锁定的是调用此方法的所有对象
+    * 若使用 synchronized (Obeject) 修饰代码块，则取决于 Object。若各线程中的 Object 是同一个（在内存中），则各个线程保持了线程同步
 
 

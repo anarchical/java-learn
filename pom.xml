@@ -18,6 +18,7 @@
         <module>06-extends</module>
         <module>07-interface</module>
         <module>15-lambda</module>
+        <module>21-patterns</module>
         <module>21-concurrent</module>
         <module>50-data-structure</module>
         <module>51-algorithm</module>
