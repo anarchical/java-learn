@@ -1,10 +1,10 @@
-package sellticket;
+package test;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author YeYaqiao
- * 资源类
+ * 卖票同步案例
  */
 public class Ticket {
 

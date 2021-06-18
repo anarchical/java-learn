@@ -5,6 +5,7 @@ import java.util.Date;
 
 /**
  * @author YeYaqiao
+ * 时钟打印
  */
 public class Clock implements Runnable {
 
