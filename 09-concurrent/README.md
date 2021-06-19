@@ -126,17 +126,19 @@ graph LR
    thread.start() ; 处于就绪状态的线程随时可能被CPU调度执行。
 
 3. **运行状态（Running）**
-   线程获取CPU权限进行执行，执行 run() 方法。需要注意的是，线程只能从就绪状态进入到运行状态，也可以从运行状态直接进入到就绪状态（通过执行 yield() 方法）
+   线程获取 CPU 资源进行执行，执行 run() 方法。需要注意的是，线程只能从就绪状态进入到运行状态，也可以从运行状态直接进入到就绪状态（通过执行 yield() 方法）；线程失去 CPU 资源以后直接进入到就绪状态
 
    thread.run()
 
 4. **阻塞状态（Blocked）**
    阻塞状态是线程因为某种原因放弃CPU使用权限，暂时停止运行。直到线程进入就绪状态，才有机会进入运行状态。阻塞的三种情况：
 
-    1. 等待阻塞，通过调用线程的wait()方法，让线程等待某工作的完成
-    2. 同步阻塞，线程在获取synchronized同步锁失败（因为锁被其他线程占用）
-    3. 其它阻塞，通过调用线程的sleep()或join()或发出了I/O请求时，线程会进入到阻塞状态。当sleep()状态超时、join()等待线程终止或超时、或者I/O处理完毕时，线程重新转入就绪状态。
+     1. 等待阻塞，通过调用线程的wait()方法，让线程等待某工作的完成
+     2. 同步阻塞，线程在获取synchronized同步锁失败（因为锁被其他线程占用）
+     3. 其它阻塞，通过调用线程的sleep()或join()或发出了I/O请求时，线程会进入到阻塞状态。当sleep()状态超时、join()等待线程终止或超时、或者I/O处理完毕时，线程重新转入就绪状态。
 
+   注意：阻塞的线程被唤醒后只能进入就绪状态，不能直接进入运行状态
+   
 5. **死亡状态（Dead）**
    线程执行完了或因异常退出了run()方法，该线程结束生命周期。
 
@@ -549,17 +551,109 @@ java.util.concurrent 中存放了 Java 并发编程的相关的 API
 
   分布式：将整个系统拆分成不同的模块，交给不同的服务器来运行
 
-1. `CopyOnWriteArrayList` 写时复制
+1. `CopyOnWriteArrayList` 写时复制（线程安全的List）
 
-   每次向容器中添加元素时，现将原来的容器
+   ConcurrentModificationException 并发修改异常，对线程对 ArrayList 同时进行读写操作时，会产生此异常 
+
+   当我们往一个容器中添加元素的时候，不是直接操作这个容器，而是将原来的容器先复制一份，往复制出来的新容器中添加元素，添加完毕后，再将原容器的引用指向新容器（目的是问了防止读阻塞，但是会出现读写不一致的问题，使用 volatile 关键字解决），以此来解决并发修改异常（实际上还是使用了 ReentrantLock 加锁解决线程安全问题），实际上就是实现了读写分离（防止读阻塞）。
 
 2. `CountDownLatch` 减法计数器
 
+   ```java
+   public class MyCountDownLatch {
+   
+       public static void main(String[] args) {
+   
+           CountDownLatch count = new CountDownLatch(50);
+   
+           new Thread(() -> {
+               for (int i = 0; i < 50; i++) {
+                   System.out.println("线程一执行");
+                   count.countDown();
+               }
+           }).start();
+   
+           try {
+               count.await(); //减法计数器设置的值减完之前，其它线程处于阻塞状态
+           } catch (InterruptedException e) {
+               e.printStackTrace();
+           }
+   
+           new Thread(() -> {
+               for (int i = 0; i < 50; i++) {
+                   System.out.println("线程二执行");
+               }
+           }).start();
+       }
+   }
+   ```
+
+   使用减法计数器的线程会在计数器清零前独占 CPU 运行，减法计数器设置的值减完之前，其它线程处于阻塞状态；减法计数器清零以后，唤醒其它的等待线程进入到就绪状态，等待获取 CPU 资源运行
+
+   `countDown()` :计数器减一
+
+   `await()`: 使计数器产生作用（先阻塞其它线程，计数器清零后唤醒其它线程）
+
+   注意：使用计数器的线程执行的总次数一定要大于等于计数器数，否则会导致计数器不能清零，不能唤醒其它线程，导致死锁
+
 3. `CyclicBarrier`加法计数器
+
+   ```java
+   public class MyCyclicBarrier {
+       
+       public static void main(String[] args) {
+   
+           CyclicBarrier cyclicBarrier = new CyclicBarrier(10, () -> {
+               System.out.println("放行");
+           });
+   
+           for (int i = 0; i < 40; i++) {
+   
+               final int temp = i;
+               new Thread(() -> {
+                   System.out.println(temp);
+                   try {
+                       cyclicBarrier.await();//加法计数器执行一次
+                   } catch (InterruptedException | BrokenBarrierException e) {
+                       e.printStackTrace();
+                   }
+               }).start();
+           }
+       }
+   }
+   ```
+
+   当 await() 被调用指定的次数后，加法计数器清零，cyclicBarrier 中的线程被执行
+   若 await() 执行的次数不等于加法计数器的倍数，则加法计数器所持有的线程处于阻塞状态
 
 4. `Semaphore` 计数信号量
 
-   限制访问资源的线程数量；初始化、获取许可、释放许可
+   ```java
+   public class MySemaphore {
+   
+       public static void main(String[] args) {
+   
+           Semaphore semaphore = new Semaphore(5);//初始化许可的数量
+   
+           for (int i = 1; i <= 15; i++) {
+               new Thread(() -> {
+                   try {
+                       semaphore.acquire();//当前线程尝试获取访问许可
+                       System.out.println(Thread.currentThread().getName() + "开始访问");
+                       Thread.sleep(2000);//休眠两秒，模拟其它操作
+                   } catch (InterruptedException e) {
+                       e.printStackTrace();
+                   } finally {
+                       System.out.println(Thread.currentThread().getName() + "访问结束");
+                       semaphore.release();//释放许可
+                   }
+               }, "线程" + i).start();
+           }
+       }
+   }
+   ```
+   
+   限制访问资源的线程数量；初始化访问资源的许可数量、获取许可、释放许可
 
 #### 常见问题
 
@@ -572,5 +666,4 @@ java.util.concurrent 中存放了 Java 并发编程的相关的 API
     * 若 synchronized 修饰的是静态方法，则锁定的是调用此方法的所有对象
     * 若 synchronized 修饰的是类，则锁定的是调用此方法的所有对象
     * 若使用 synchronized (Obeject) 修饰代码块，则取决于 Object。若各线程中的 Object 是同一个（在内存中），则各个线程保持了线程同步
-
 
