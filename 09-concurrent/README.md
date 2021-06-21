@@ -551,109 +551,274 @@ java.util.concurrent 中存放了 Java 并发编程的相关的 API
 
   分布式：将整个系统拆分成不同的模块，交给不同的服务器来运行
 
-1. `CopyOnWriteArrayList` 写时复制（线程安全的List）
+##### 常用 JUC API
 
-   ConcurrentModificationException 并发修改异常，对线程对 ArrayList 同时进行读写操作时，会产生此异常 
+CopyOnWriteArrayList、CountDownLatch、CyclicBarrier、Semaphore
 
-   当我们往一个容器中添加元素的时候，不是直接操作这个容器，而是将原来的容器先复制一份，往复制出来的新容器中添加元素，添加完毕后，再将原容器的引用指向新容器（目的是问了防止读阻塞，但是会出现读写不一致的问题，使用 volatile 关键字解决），以此来解决并发修改异常（实际上还是使用了 ReentrantLock 加锁解决线程安全问题），实际上就是实现了读写分离（防止读阻塞）。
+###### `CopyOnWriteArrayList` 
 
-2. `CountDownLatch` 减法计数器
+ConcurrentModificationException 并发修改异常，对线程对 ArrayList 同时进行读写操作时，会产生此异常 
 
-   ```java
-   public class MyCountDownLatch {
-   
-       public static void main(String[] args) {
-   
-           CountDownLatch count = new CountDownLatch(50);
-   
-           new Thread(() -> {
-               for (int i = 0; i < 50; i++) {
-                   System.out.println("线程一执行");
-                   count.countDown();
-               }
-           }).start();
-   
-           try {
-               count.await(); //减法计数器设置的值减完之前，其它线程处于阻塞状态
-           } catch (InterruptedException e) {
-               e.printStackTrace();
-           }
-   
-           new Thread(() -> {
-               for (int i = 0; i < 50; i++) {
-                   System.out.println("线程二执行");
-               }
-           }).start();
-       }
-   }
-   ```
+写时复制（线程安全的List）当我们往一个容器中添加元素的时候，不是直接操作这个容器，而是将原来的容器先复制一份，往复制出来的新容器中添加元素，添加完毕后，再将原容器的引用指向新容器（目的是问了防止读阻塞，但是会出现读写不一致的问题，使用 volatile 关键字解决），以此来解决并发修改异常（实际上还是使用了 ReentrantLock 加锁解决线程安全问题），实际上就是实现了读写分离（防止读阻塞）。
 
-   使用减法计数器的线程会在计数器清零前独占 CPU 运行，减法计数器设置的值减完之前，其它线程处于阻塞状态；减法计数器清零以后，唤醒其它的等待线程进入到就绪状态，等待获取 CPU 资源运行
+###### `CountDownLatch` 
 
-   `countDown()` :计数器减一
+减法计数器
 
-   `await()`: 使计数器产生作用（先阻塞其它线程，计数器清零后唤醒其它线程）
+```java
+public class MyCountDownLatch {
 
-   注意：使用计数器的线程执行的总次数一定要大于等于计数器数，否则会导致计数器不能清零，不能唤醒其它线程，导致死锁
+    public static void main(String[] args) {
 
-3. `CyclicBarrier`加法计数器
+        CountDownLatch count = new CountDownLatch(50);
 
-   ```java
-   public class MyCyclicBarrier {
-       
-       public static void main(String[] args) {
-   
-           CyclicBarrier cyclicBarrier = new CyclicBarrier(10, () -> {
-               System.out.println("放行");
-           });
-   
-           for (int i = 0; i < 40; i++) {
-   
-               final int temp = i;
-               new Thread(() -> {
-                   System.out.println(temp);
-                   try {
-                       cyclicBarrier.await();//加法计数器执行一次
-                   } catch (InterruptedException | BrokenBarrierException e) {
-                       e.printStackTrace();
-                   }
-               }).start();
-           }
-       }
-   }
-   ```
+        new Thread(() -> {
+            for (int i = 0; i < 50; i++) {
+                System.out.println("线程一执行");
+                count.countDown();
+            }
+        }).start();
 
-   当 await() 被调用指定的次数后，加法计数器清零，cyclicBarrier 中的线程被执行
-   若 await() 执行的次数不等于加法计数器的倍数，则加法计数器所持有的线程处于阻塞状态
+        try {
+            count.await(); //减法计数器设置的值减完之前，其它线程处于阻塞状态
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-4. `Semaphore` 计数信号量
+        new Thread(() -> {
+            for (int i = 0; i < 50; i++) {
+                System.out.println("线程二执行");
+            }
+        }).start();
+    }
+}
+```
 
-   ```java
-   public class MySemaphore {
-   
-       public static void main(String[] args) {
-   
-           Semaphore semaphore = new Semaphore(5);//初始化许可的数量
-   
-           for (int i = 1; i <= 15; i++) {
-               new Thread(() -> {
-                   try {
-                       semaphore.acquire();//当前线程尝试获取访问许可
-                       System.out.println(Thread.currentThread().getName() + "开始访问");
-                       Thread.sleep(2000);//休眠两秒，模拟其它操作
-                   } catch (InterruptedException e) {
-                       e.printStackTrace();
-                   } finally {
-                       System.out.println(Thread.currentThread().getName() + "访问结束");
-                       semaphore.release();//释放许可
-                   }
-               }, "线程" + i).start();
-           }
-       }
-   }
-   ```
-   
-   限制访问资源的线程数量；初始化访问资源的许可数量、获取许可、释放许可
+使用减法计数器的线程会在计数器清零前独占 CPU 运行，减法计数器设置的值减完之前，其它线程处于阻塞状态；减法计数器清零以后，唤醒其它的等待线程进入到就绪状态，等待获取 CPU 资源运行
+
+`countDown()` :计数器减一
+
+`await()`: 使计数器产生作用（先阻塞其它线程，计数器清零后唤醒其它线程）
+
+注意：使用计数器的线程执行的总次数一定要大于等于计数器数，否则会导致计数器不能清零，不能唤醒其它线程，导致死锁
+
+###### `CyclicBarrier`
+
+加法计数器
+
+```java
+public class MyCyclicBarrier {
+    
+    public static void main(String[] args) {
+
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(10, () -> {
+            System.out.println("放行");
+        });
+
+        for (int i = 0; i < 40; i++) {
+
+            final int temp = i;
+            new Thread(() -> {
+                System.out.println(temp);
+                try {
+                    cyclicBarrier.await();//加法计数器执行一次
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    }
+}
+```
+
+当 await() 被调用指定的次数后，加法计数器清零，cyclicBarrier 中的线程被执行
+若 await() 执行的次数不等于加法计数器的倍数，则加法计数器所持有的线程处于阻塞状态
+
+###### `Semaphore` 
+
+计数信号量
+
+```java
+public class MySemaphore {
+
+    public static void main(String[] args) {
+
+        Semaphore semaphore = new Semaphore(5);//初始化许可的数量
+
+        for (int i = 1; i <= 15; i++) {
+            new Thread(() -> {
+                try {
+                    semaphore.acquire();//当前线程尝试获取访问许可
+                    System.out.println(Thread.currentThread().getName() + "开始访问");
+                    Thread.sleep(2000);//休眠两秒，模拟其它操作
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    System.out.println(Thread.currentThread().getName() + "访问结束");
+                    semaphore.release();//释放许可
+                }
+            }, "线程" + i).start();
+        }
+    }
+}
+```
+
+限制访问资源的线程数量；初始化访问资源的许可数量、获取许可、释放许可
+
+##### 读写锁
+
+ReadWriteLock 接口，实现类为 ReentrantReadWriteLock，可以多个线程同时读，但是同一时刻只能有一个线程写入（读锁是一个共享锁，写锁是一个独占锁）
+
+* 共享锁（读锁）
+
+  读取数据时，不允许其他事务对当前数据进行修改操作，从而避免”不可重读”的问题的出现
+
+* 独占锁（写锁、排它锁）
+
+  在修改数据时，不允许其他事务对当前数据进行修改和读取操作，从而可以有效避免”脏读”问题的产生
+
+ ```java
+ public class MyReadWriteLock {
+ 
+     public static void main(String[] args) {
+         Cache cache = new Cache();
+ 
+         //五个线程写操作
+         for (int i = 0; i < 5; i++) {
+             final int temp = i;
+             new Thread(() -> {
+                 cache.write(temp, String.valueOf(temp));
+             }).start();
+         }
+ 
+         //五个线程读操作
+         for (int i = 0; i < 5; i++) {
+             final int temp = i;
+             new Thread(() -> {
+                 cache.read(temp);
+             }).start();
+         }
+     }
+ }
+ 
+ class Cache {
+ 
+     private final Map<Integer, String> cache = new HashMap<>();
+ 
+     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+ 
+     public void write(Integer key, String value) {
+         readWriteLock.writeLock().lock();
+         
+         System.out.println("write key: " + key + " value:" + value);
+         cache.put(key, value);
+         System.out.println("write done: " + key);
+         
+         readWriteLock.writeLock().unlock();
+     }
+ 
+     public void read(Integer key) {
+         readWriteLock.readLock().lock();
+         
+         System.out.println("read key:" + key);
+         System.out.println("read done value:" + cache.get(key));
+         
+         readWriteLock.readLock().unlock();
+     }
+ 
+ }
+ ```
+
+##### 线程池
+
+存放线程对象的缓冲池，为了节约资源；预先创建一定数量的线程对象，放入缓冲池中，需要的时候取出使用，使用完毕后放回缓冲池中，供下一次使用
+
+优势
+
+* 提高线程的利用率
+* 提高程序的响应速度（没有创建线程时的耗时）
+* 便于统一管理线程对象
+* 可以控制程序的最大并发数
+
+###### 7大核心参数
+
+1. corePoolSize： 核心池的大小（默认可用线程的数量）
+2. maximumPoolSize： 线程池的最大线程数（所有线程总数）
+3. keepAliveTime：线程工厂产生的线程中空闲线程的存活时长
+4. unit： keepAliveTime 的时间单位
+5. workQueue：阻塞队列
+6. threadFactory：线程工厂（生成线程）
+7. handler：拒绝任务策略
+
+执行过程：当核心池满时，新增的线程会在阻塞队列中等待；当阻塞队列满时，会调用线程工厂新增线程，直到达到最大线程数；达到最大线程数后，再新增线程会触发拒绝策略；当线程工厂所产生的线程的任务执行完毕后，存活指定的时间后，若没有新的任务，则自动销毁
+
+```java
+public class MyExecutorService {
+
+    public static void main(String[] args) {
+        ExecutorService executorService = new ThreadPoolExecutor(
+                2, //核心线程数
+                3, //最大线程数
+                1L, //存活时间
+                TimeUnit.SECONDS, //时间单位
+                new ArrayBlockingQueue<>(2), //阻塞队列数
+                Executors.defaultThreadFactory(), //线程工厂 当阻塞队列数和核心线程数饱和时，线程工厂开始创建新的线程，直到达到线程池最大线程数，再添加新的线程则触发拒绝策略
+                new ThreadPoolExecutor.AbortPolicy()); //拒绝策略 （ThreadPoolExecutor.AbortPolicy()为直接抛异常）
+
+
+        for (int i = 0; i < 5; i++) {
+
+            executorService.execute(() -> {
+                System.out.println(Thread.currentThread().getName() + "run");
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(Thread.currentThread().getName() + "end");
+            });
+        }
+        executorService.shutdown();
+
+    }
+
+}
+```
+
+###### 快速创建线程池（不可控）
+
+1. `Executors.newSingleThreadExecutor()`创建一个单例线程池，里面只有一个线程对象
+2. `Executors.newFixedThreadPool(int num)`快速创建一个指定数量的线程池 核心数和最大数一样
+3. `Executors.newCachedThreadPool()`由电脑配置自动分配线程数量
+
+```java
+public class MyExecutors {
+
+    public static void main(String[] args) {
+
+//        ExecutorService executors = Executors.newSingleThreadExecutor();//创建一个单例线程池，里面只有一个线程对象
+
+//        ExecutorService executors = Executors.newFixedThreadPool(5);//快速创建一个指定数量的线程池 核心数和最大数一样
+
+        ExecutorService executors = Executors.newCachedThreadPool();//由电脑配置自动分配线程数量
+        for (int i = 0; i < 10; i++) {
+            final int temp = i;
+            executors.execute(() -> {
+                System.out.println(Thread.currentThread().getName() + temp);
+            });
+        }
+
+        executors.shutdown();
+    }
+}
+```
+
+###### 线程池的拒绝策略
+
+* AbortPolicy                 直接抛出异常
+* DiscardPolicy              放弃任务，不抛出异常
+* DiscardOldestPolicy  尝试与阻塞队列中最前面的任务去争夺，不抛出异常
+* CallerRunPolicy          交给调用方处理
 
 #### 常见问题
 
