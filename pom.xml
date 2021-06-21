@@ -24,6 +24,7 @@
         <module>51-algorithm</module>
         <module>08-exception</module>
         <module>09-concurrent</module>
+        <module>10-collection</module>
 
     </modules>
 
