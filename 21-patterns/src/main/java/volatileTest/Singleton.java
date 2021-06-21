@@ -1,20 +1,20 @@
-package singleton;
+package volatileTest;
 
 /**
  * @author YeYaqiao
- * 线程安全的单例模式
+ * 单例模式
  */
 public class Singleton {
 
-    private volatile static Singleton singleton;
+    private volatile static Singleton singleton;//工作内存可见
 
     private Singleton() {
     }
 
     public static Singleton getInstance() {
 
-        if (singleton == null) {
-            synchronized (Singleton.class) {
+        if (singleton == null) { //提高效率
+            synchronized (Singleton.class) { //线程同步
                 if (singleton == null) {
                     singleton = new Singleton();
                 }
