@@ -109,6 +109,56 @@ LinkedHashSet 存储一组有序且唯一的元素，可以通过下标访问任
 
 TreeSet 存储一组有序且唯一的元素（这里的有序指的是元素本身的大小，默认按照升序排列；元素可以通过继承 Comparable 接口，实现 compareTo 方法定义排序逻辑），添加到 TreeSet 集合中的元素必须继承 Compareable 接口，实现 compareTo() 方法
 
+```java
+public class MyTreeSet {
+
+    public static void main(String[] args) {
+
+        Set<Node> treeSet = new TreeSet<>();
+
+        Node node1 = new Node(1);
+        Node node2 = new Node(2);
+        Node node3 = new Node(3);
+
+        treeSet.add(node3);
+        treeSet.add(node2);
+        treeSet.add(node1);
+
+        System.out.println(treeSet);
+    }
+}
+
+//存储元素需要继承 Comparable 实现 compareTo 方法
+class Node implements Comparable<Node> {
+
+    public int value;
+
+    public Node(int value) {
+        this.value = value;
+    }
+
+    //规定排序规则
+    //返回 -1表示小于，0表示等于，1表示大于
+    @Override
+    public int compareTo(Node o) {
+        if (this.value < o.value) {
+            return -1;
+        } else if (this.value == o.value) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "value=" + value +
+                '}';
+    }
+}
+```
+
 #### Map（接口）
 
 Map 存储一组键值对 key-value；key 具有唯一性，不可以重复；value 可以重复
@@ -144,7 +194,22 @@ LinkedHashMap 是一组有序的（按照存储顺序），key 不可重复、va
    * 数据量大：LinkedList 插入操作优势更明显，ArrayList 的扩容、复制操作耗时明显
    * 数据量小：ArrayList 插入操作优势更明显，LinkedList 的 new Node() 操作耗时明显
 
-2. 集合框架中有哪些实现类是线程安全的
+2. 集合框架中有哪些实现类是线程安全的？
 
    Hashtable、Vector；不建议用，因为是早期提供的线程安全集合，效率较低；可以使用 JUC（java.concurrent.util）中的线程安全的集合 ConcurrentHashMap、CopyOnWriteArrayList 来替代
+
+3. 怎样使元素具有可排序性？
+
+   让元素继承 Comparable 接口实现 compareTo 方法使具有排序性
+
+   tree 类的集合每次存入元素时，会将调用当前元素的 compareTo() 与集合中的其他元素作比较
+
+   例如 A.compareTo(B)，会返回一个 int 类型的值，如果：
+
+   -1： A < B
+
+   0： A = B
+
+   1： A > B
+
 
