@@ -163,21 +163,31 @@ class Node implements Comparable<Node> {
 
 Map 存储一组键值对 key-value；key 具有唯一性，不可以重复；value 可以重复
 
+键值对能不能存 null 取决于有没有其余作用，如 TreeMap 需要根据 key 继承的 Comparable 接口排序，所以不能存 null
+
 ##### HashMap
 
 HashMap 存储一组无序的、key 不可重复、value 可以重复的元素
+
+HashMap 可以存入 null 键和 null 值
 
 ##### Hashtable
 
 Hashtable 存储一组无序的、key 不可重复、value 可以重复的元素；是线程安全的
 
+Hashtable 不允许存入 null 键和 null 值
+
 ##### TreeMap
 
 TreeMap 存储一组有序的（按照 key 的排序规则 Compareable）、key 不可重复、value 可以重复的元素
 
+TreeMap 不可以存 null 键，但是可以存 null 值（因为需要按照键来排序）
+
 ##### LinkedHashMap
 
 LinkedHashMap 是一组有序的（按照存储顺序），key 不可重复、value 可以重复的元素
+
+LinkedHashMap 可以存入 null 键和 null 值
 
 #### 常见问题
 
@@ -194,7 +204,11 @@ LinkedHashMap 是一组有序的（按照存储顺序），key 不可重复、va
    * 数据量大：ArrayList 插入操作优势更明显，ArrayList 的扩容次数变小
    * 数据量小：LinkedList 插入操作优势更明显，ArrayList 频繁插入可能需要多次扩容
 
-   实际使用 Iterator 遍历集合时，LinkedList 的效率和 ArrayList 效率差别不会太大
+   ArrayList 的耗时操作为扩容
+
+   LinkedList 的耗时操作为遍历
+
+   实际使用 Iterator 遍历集合时，LinkedList 的效率和 ArrayList 效率差别不会太大，因为 Iterator 会缓存节点的位置信息
 
 2. 集合框架中有哪些实现类是线程安全的？
 
@@ -213,5 +227,7 @@ LinkedHashMap 是一组有序的（按照存储顺序），key 不可重复、va
    0： A = B
 
    1： A > B
+
+4. 为什么 Hashtale 不能用 null，但是 HashMap 可以呢？ 
 
 
