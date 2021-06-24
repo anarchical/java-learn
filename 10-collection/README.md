@@ -80,10 +80,10 @@ public class MyArrayList {
 
 ##### LinkedList
 
-LinkedList 是基于链表的数据结构，在内存中不连续分配，通过存储彼此的引用关联起来；是线程不安全的
+LinkedList 是基于双向链表的数据结构，在内存中不连续分配，通过存储彼此的引用关联起来；是线程不安全的
 
-* 优点：插入移除元素效率高（其实并不高，因为需要做遍历操作）
-* 缺点：遍历查询元素效率低 （get() 方法的底层还是使用了遍历查询）
+* 优点：插入移除元素效率较高（其实并不高，因为需要做遍历操作）
+* 缺点：遍历查询元素效率较低 （get() 方法的底层还是使用了遍历查询）
 
 ##### Vector
 
@@ -189,10 +189,12 @@ LinkedHashMap 是一组有序的（按照存储顺序），key 不可重复、va
    * 在中部插入数据：ArrayList 可能较快；LinkedList 需要执行遍历操作，越往中间遍历越久
    * 在尾部插入数据：ArrayList 较快；ArrayList 需要移动的数据变少
 
-   数据量大小两种情况：
+   数据量大小两种情况（以100000条数据为分界点）：
 
-   * 数据量大：LinkedList 插入操作优势更明显，ArrayList 的扩容、复制操作耗时明显
-   * 数据量小：ArrayList 插入操作优势更明显，LinkedList 的 new Node() 操作耗时明显
+   * 数据量大：ArrayList 插入操作优势更明显，ArrayList 的扩容次数变小
+   * 数据量小：LinkedList 插入操作优势更明显，ArrayList 频繁插入可能需要多次扩容
+
+   实际使用 Iterator 遍历集合时，LinkedList 的效率和 ArrayList 效率差别不会太大
 
 2. 集合框架中有哪些实现类是线程安全的？
 
