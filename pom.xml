@@ -25,6 +25,7 @@
         <module>08-exception</module>
         <module>09-concurrent</module>
         <module>10-collection</module>
+        <module>14-IO</module>
 
     </modules>
 
