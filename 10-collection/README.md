@@ -195,6 +195,8 @@ HashMap 的默认容量为16，达到阈值（加载因子为0.75，元素数量
   
     解决哈希冲突，引用哈希桶；本质就是将相同的 hashvalue 的 key 存放在同一个单向链表中（链地址法）；在查询数据时，先通过 key 索引到相应位置的桶，然后遍历桶中的链表，直到找到对应的 key 值
   
+    哈希桶本质就是一个能够存储链表元素的数组
+  
     最坏情况下所有 key 都对应同一个 hashvalue，那么就会退化成一个单向链表，造成其它桶的浪费，所以hash 函数的选择很关键；同时 JDK1.8 以后加入了红黑树，当链表的长度大于等于8时，则会转换为红黑树，以提高查询效率
   
   * 红黑树（自平衡二叉树）
@@ -204,107 +206,197 @@ HashMap 的默认容量为16，达到阈值（加载因子为0.75，元素数量
 * HashMap 源码解读
 
   * HashMap() 构造器
-
+  
     ```java
         //不会直接创建创建 hashbucket，而是先定义加载因子，扩容指标，规定元素数量达到容量的0.75倍时扩容（当调用 put() 方法添加元素时，才会创建数组，属于懒加载）
         static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    		//构造器、获得加载因子
+        //构造器、获得加载因子
         public HashMap() {
             this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
         }
-  ```
+    ```
   
   * hash 哈希算法
-    
+  
     ```java
         //如果 key = null 时，hash 值为0
-    		//如果 key 不等于 null，则将 key 的 hashCode 与 hashcode>>>16（hashCode/2^16，hashCode 的高16位）作异或运算（相同为0，不同为1）
-    		static final int hash(Object key) {
+        //如果 key 不等于 null，则将 key 的 hashCode 与 hashcode>>>16（hashCode/2^16，hashCode 的高16位）作异或运算（相同为0，不同为1）
+        static final int hash(Object key) {
             int h;
             return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
         }
     ```
-    
+  
     作用：hashCode 是一个 int 类型（32位）的整数，取值范围约等于-21亿~21亿，共有40多亿个hashCode，而初始化的数组长度为16，远远小于 hashCode 的值范围；所以需要将 hashCode 与自己的高16位进行异或运算，混合原始 hashCode 的高位和低位，加大低位的随机性（后续由于数组大小原因需要舍弃高位值，所以加大低位的随机性可以保证计算出的新的 hashCode 尽量保持唯一性），得到新的 hash 值
     
-  * put(K key, V value) 添加元素方法
+  * resize() 初始化/扩容操作
+  
+    ```java
+        final Node<K,V>[] resize() {
+            //声明 Node 数组 oldTab 用于记录 hashBucket 原始的内容
+            Node<K,V>[] oldTab = table;
+            //声明 oldCap 记录 hashBucket 的原始长度
+            int oldCap = (oldTab == null) ? 0 : oldTab.length;
+            //声明 oldThr 记录扩容阈值，首次初始化时为 0
+            int oldThr = threshold;
+            //声明新的数组容量和新的阈值
+            int newCap, newThr = 0;
+            //判断 oldCap 原始长度是否大于0，若是则执行扩容操作
+            if (oldCap > 0) {
+                if (oldCap >= MAXIMUM_CAPACITY) {
+                    threshold = Integer.MAX_VALUE;
+                    return oldTab;
+                }
+                else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
+                         oldCap >= DEFAULT_INITIAL_CAPACITY)
+                    newThr = oldThr << 1; // double threshold
+            }
+            //判断原始阈值 oldThr 是否大于 0，若是则将老的阈值 oldThr 赋值给新的容量 newCap
+            else if (oldThr > 0) // initial capacity was placed in threshold
+                newCap = oldThr;
+            //若以上都不满足，则代表首次初始化数组
+            else {               // zero initial threshold signifies using defaults
+                //赋值给新的容量 newCap 默认初始容量 default initial capacity 为16
+                newCap = DEFAULT_INITIAL_CAPACITY;
+                //赋值给新的扩容阈值 newThr 默认初始容量*加载因子 16*0.75 为12
+                newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+            }
+            //判断此时扩容阈值 newThr 是否等于0
+            if (newThr == 0) {
+                float ft = (float)newCap * loadFactor;
+                newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ?
+                          (int)ft : Integer.MAX_VALUE);
+            }
+            threshold = newThr;
+            @SuppressWarnings({"rawtypes","unchecked"})
+                Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
+            table = newTab;
+            if (oldTab != null) {
+                for (int j = 0; j < oldCap; ++j) {
+                    Node<K,V> e;
+                    if ((e = oldTab[j]) != null) {
+                        oldTab[j] = null;
+                        if (e.next == null)
+                            newTab[e.hash & (newCap - 1)] = e;
+                        else if (e instanceof TreeNode)
+                            ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
+                        else { // preserve order
+                            Node<K,V> loHead = null, loTail = null;
+                            Node<K,V> hiHead = null, hiTail = null;
+                            Node<K,V> next;
+                            do {
+                                next = e.next;
+                                if ((e.hash & oldCap) == 0) {
+                                    if (loTail == null)
+                                        loHead = e;
+                                    else
+                                        loTail.next = e;
+                                    loTail = e;
+                                }
+                                else {
+                                    if (hiTail == null)
+                                        hiHead = e;
+                                    else
+                                        hiTail.next = e;
+                                    hiTail = e;
+                                }
+                            } while ((e = next) != null);
+                            if (loTail != null) {
+                                loTail.next = null;
+                                newTab[j] = loHead;
+                            }
+                            if (hiTail != null) {
+                                hiTail.next = null;
+                                newTab[j + oldCap] = hiHead;
+                            }
+                        }
+                    }
+                }
+            }
+            return newTab;
+        }
+    ```
+  
     
+  
+  * put(K key, V value) 添加元素方法
+  
     ```java
         //新增元素方法，调用了 putVal(hash(key), key, value, false, true) 方法
-    		public V put(K key, V value) {
+         public V put(K key, V value) {
             return putVal(hash(key), key, value, false, true);
         }
-    		//实际新增元素的方法
+        //实际新增元素的方法
+        //onlyIfAbsent（如果不存在才执行更新赋值操作） 判断是否执行覆盖更新操作，默认为 false，执行覆盖更新
+        //evict（驱逐） 用于子类 LinkedHashMap，判断是否删除老旧元素
         final V putVal(int hash, K key, V value, boolean onlyIfAbsent, 
                        boolean evict) {
             //声明一个 Node 类型的数组 tab（实际成员变量 table 为哈希桶，通过 tab 引用 table 来进行操作）
-    				Node<K,V>[] tab; Node<K,V> p; int n, i;
-          	//如果 tab 为 null 或者 tab 长度为0，则调用 resize() 方法进行初始化和扩容操作（懒加载）
+            Node<K,V>[] tab; Node<K,V> p; int n, i;
+            //如果 tab 为 null 或者 tab 长度为0，则调用 resize() 方法进行初始化和扩容操作（懒加载）
             if ((tab = table) == null || (n = tab.length) == 0)
-              	//使用 n 来记录数组的长度，首次初始化的长度为16
+                //使用 n 来记录数组的长度，首次初始化的长度为16
                 n = (tab = resize()).length;
-          	//计算索引 i，通过引用 p 来取出元素，并判断是否为 null（数组长度-1与 hash 进行按位与运算，可以保证获得的索引值小于等于当前哈希桶数组的长度）
+            //计算索引 i，通过引用 p 来取出元素，并判断是否为 null（数组长度-1与 hash 进行按位与运算，可以保证获得的索引值小于等于当前哈希桶数组的长度）
             if ((p = tab[i = (n - 1) & hash]) == null)
-              	//若元素为 null（没有发生 hash 碰撞），则调用 newNode 方法创建新的 Node 添加进哈希桶
+                //若元素为 null（没有发生 hash 碰撞），则调用 newNode 方法创建新的 Node 添加进哈希桶
                 tab[i] = newNode(hash, key, value, null);
             else {
-              	//若元素不为 null（发生了 hash 碰撞），则先声明一个新的 Node e 和一个新 k
+                //若元素不为 null（发生了 hash 碰撞），则先声明一个新的 Node e 和一个新 k
                 Node<K,V> e; K k;
-              	//判断数组中元素 p 的 hash、key 和待添加的元素的 hash 和 key 是否相等
+                //判断数组中元素 p 的 hash、key 和待添加的元素的 hash 和 key 是否相等
                 if (p.hash == hash &&
                     ((k = p.key) == key || (key != null && key.equals(k))))
-                  	//若相等，将引用 e 指向数组中的元素 p
+                    //若相等，将引用 e 指向数组中的元素 p
                     e = p;
-              	//判断数组中的元素 p 是否是 TreeNode（红黑树）类型
+                //判断数组中的元素 p 是否是 TreeNode（红黑树）类型
                 else if (p instanceof TreeNode)
-                  	//若数组中的元素 p 是 TreeNode 类型，则将 p 强转成 TreeNode 并把待添加的数据填充进去，并将节点返回给引用 e
+                    //若数组中的元素 p 是 TreeNode 类型，则将 p 强转成 TreeNode 并把待添加的数据填充进去，并将节点返回给引用 e
                     e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
                 else {
-                  	//如果 p 不是红黑树类型（则是链表），则开始遍历链表（此处实际为死循环，binCount 用于记录链表长度，因为是从0开始遍历的，所以此时链表长度应该是 binCount+1）
+                    //如果 p 不是红黑树类型（则是链表），则开始遍历链表（此处实际为死循环，binCount 用于记录链表长度，因为是从0开始遍历的，所以此时链表长度应该是 binCount+1）
                     for (int binCount = 0; ; ++binCount) {
-                      	//找到链表中的最后一位并赋值给引用 e
+                        //找到链表中的最后一位并赋值给引用 e
                         if ((e = p.next) == null) {
-                          	//创建一个新的 Node，把数据填充进去并加入到链表的末尾
+                            //创建一个新的 Node，把数据填充进去并加入到链表的末尾
                             p.next = newNode(hash, key, value, null);
-                          	//判断此时链表长度是否大于等于8
+                            //判断此时链表长度是否大于等于8
                             if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
                               //若大于等于8，则将此链表装换成 TreeNode（红黑树）  
                               treeifyBin(tab, hash);
-                          	//退出遍历循环
+                            //退出遍历循环
                             break;
                         }
-                      	//若当前遍历的元素 e 的 hash、key 等于待添加元素的 hash、key 或者 key 不为 null 且两个 key 地址相等，则说明当前链表中已经存在此 key 值，直接退出循环
+                        //若当前遍历的元素 e 的 hash、key 等于待添加元素的 hash、key 或者 key 不为 null 且两个 key 地址相等，则说明当前链表中已经存在此 key 值，直接退出循环
                         if (e.hash == hash &&
                             ((k = e.key) == key || (key != null && key.equals(k))))
                             break;
-                      	//引用指向下一个元素
+                        //引用指向下一个元素
                         p = e;
                     }
                 }
-              	//判断当前待覆盖的元素是否为空
+                //判断当前待覆盖的元素是否为空
                 if (e != null) { // existing mapping for key
-                  	//若不为空，则将旧的 value 赋值给 oldValue
+                    //若不为空，则将旧的 value 赋值给 oldValue
                     V oldValue = e.value;
-                  	//更新集合中对应 key 的 value 值
+                    //更新集合中对应 key 的 value 值
                     if (!onlyIfAbsent || oldValue == null)
                         e.value = value;
                     afterNodeAccess(e);
-                  	//将旧值返回
+                    //将旧值返回
                     return oldValue;
                 }
             }
-          	//修改次数+1
+            //修改次数+1
             ++modCount;
-          	//更新大小并判断是否需要扩容
+            //更新大小并判断是否需要扩容
             if (++size > threshold)
-          			//执行扩容操作
+                //执行扩容操作
                 resize();
-          	//空函数，用作 LinkedHashMap 重新使用
+            //空函数，用作 LinkedHashMap 重新使用
             afterNodeInsertion(evict);
             return null;
         }
-    
-    
     ```
     
     
@@ -371,5 +463,4 @@ LinkedHashMap 可以存入 null 键和 null 值
    1： A > B
 
 4. 为什么 Hashtale 不能用 null，但是 HashMap 可以呢？ 
-
 

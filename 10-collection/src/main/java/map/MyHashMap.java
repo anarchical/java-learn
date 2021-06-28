@@ -11,9 +11,9 @@ public class MyHashMap {
 
     public static void main(String[] args) {
 
-        Map<String,String> map=new HashMap<>();
+        Map<String, String> map = new HashMap<>();
 
-        map.put(null,null);
+        map.put(null, null);
         System.out.println(map);
     }
 }
