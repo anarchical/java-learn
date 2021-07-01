@@ -26,6 +26,7 @@
         <module>09-concurrent</module>
         <module>10-collection</module>
         <module>14-IO</module>
+        <module>11-generic</module>
 
     </modules>
 
