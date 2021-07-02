@@ -8,7 +8,7 @@ package generic;
  */
 public class MyGeneric<E> {
 
-    private final E name;
+    private E name;
 
     public MyGeneric(E name) {
         this.name = name;
@@ -18,12 +18,16 @@ public class MyGeneric<E> {
         return name;
     }
 
+    public void setName(E name) {
+        this.name = name;
+    }
+
     public static void main(String[] args) {
 
         MyGeneric<String> myGeneric = new MyGeneric<>("generic");
         System.out.println(myGeneric.getName());
 
-        MyGeneric<Integer> num=new MyGeneric<>(100);
+        MyGeneric<Integer> num = new MyGeneric<>(100);
         System.out.println(num.getName());
 
     }
