@@ -33,4 +33,4 @@ public class MyGeneric<E> {
 通过占位符 `<E>` 来替代具体的数据类型；一旦创建对象确认好数据类型，其相关的数据类型只能是本类或是其子类
 
 占位符内容可是随意填写，但是一般使用 K、V、T、E 来表示（key、value、type、element）
-
+dsa
