@@ -33,4 +33,60 @@ public class MyGeneric<E> {
 通过占位符 `<E>` 来替代具体的数据类型；一旦创建对象确认好数据类型，其相关的数据类型只能是本类或是其子类
 
 占位符内容可是随意填写，但是一般使用 K、V、T、E 来表示（key、value、type、element）
-dsa
+
+#### 泛型通配符
+
+泛型的通配符解决的是**泛型标识符没有多态**的问题
+
+```java
+public class Wildcard {
+    public static void main(String[] args) {
+
+        List<String> stringList = new ArrayList<>();
+        List<Integer> integerList = new ArrayList<>();
+
+        wildcard(stringList);
+        wildcard(integerList);
+
+    }
+
+    public static void wildcard(List<?> list) {
+        System.out.println(list);
+    }
+
+//    public static void wildcard(List list){
+//        System.out.println(list);
+//    }
+}
+```
+
+#### 泛型的上限和下限
+
+对规定使用的数据类型的扩充
+
+* 泛型的上限
+
+  使用 extends 关键字，限制使用类型的上限类型
+
+  `类名 <泛型标识符 extends 上限类名>`
+
+  ```java
+  
+  ```
+
+* 泛型的下限
+
+  使用 super 关键字，限制使用类型的下限类型
+
+  `类名 <泛型标识符 super 下限类名>`
+
+  ```java
+  
+  ```
+
+  
+
+#### 泛型接口
+
+
+
