@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author YeYaqiao
  * 泛型通配符
- * 解决泛型标识符没有多态的问题
+ * 不同类型的泛型引用不能直接传递(与多态有些许相似)
  */
 public class Wildcard {
     public static void main(String[] args) {
@@ -23,7 +23,7 @@ public class Wildcard {
         System.out.println(list);
     }
 
-//    public static void wildcard(List list){
-//        System.out.println(list);
-//    }
+    public static void wildcard(List list){
+        System.out.println(list);
+    }
 }
