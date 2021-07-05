@@ -1,4 +1,4 @@
-package generic;
+package wildcard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class Wildcard {
         System.out.println(list);
     }
 
-    public static void wildcard(List list){
-        System.out.println(list);
-    }
+//    public static void wildcard(List list){
+//        System.out.println(list);
+//    }
 }

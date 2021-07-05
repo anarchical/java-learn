@@ -6,11 +6,14 @@ package generic;
  * 其中 <E> 只是一个占位符
  * 通常使用
  */
-public class MyGeneric<E> {
+public class GenericClass<E> {
 
     private E name;
 
-    public MyGeneric(E name) {
+    public GenericClass() {
+    }
+
+    public GenericClass(E name) {
         this.name = name;
     }
 
@@ -24,10 +27,11 @@ public class MyGeneric<E> {
 
     public static void main(String[] args) {
 
-        MyGeneric<String> myGeneric = new MyGeneric<>("generic");
-        System.out.println(myGeneric.getName());
+        GenericClass<String> genericClass = new GenericClass<>("generic");
+        System.out.println(genericClass.getName());
 
-        MyGeneric<Integer> num = new MyGeneric<>(100);
+        GenericClass<Integer> num = new GenericClass<>();
+        num.setName(100);
         System.out.println(num.getName());
 
     }
