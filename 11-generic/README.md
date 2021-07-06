@@ -228,7 +228,7 @@ public class GenericUnclear<T> implements Print<T> {
 
 泛型的本质是参数化类型
 
-泛型是**提供给javac编译器使用的**，它用于限定集合的输入类型，让编译器在源代码级别上，即挡住向集合中插入非法数据
+泛型是**提供给javac编译器使用的**，它用于限定集合的输入类型，让编译器在源代码级别上，挡住向集合中插入非法数据
 
 但编译器编译完带有泛形的java程序后，**生成的class文件中将不再带有泛形信息**，这个过程称之为“擦除”，目的是避免过多的创建类而造成的运行时的过度消耗
 
@@ -238,7 +238,7 @@ public class GenericUnclear<T> implements Print<T> {
 * 若有限定类型 < T exnteds XClass >，使用 XClass 作为原始类型；
 * 若有多个限定 < T exnteds XClass1 & XClass2 >，使用第一个边界类型 XClass1 作为原始类型；
 
-以下程序的运行结果始终是 true，因为本质都是 ArrayList
+以下程序用于比较两个 list 的类信息，运行结果始终是 true，因为本质都是 ArrayList
 
 ```java
 public class Erasure {
@@ -255,5 +255,4 @@ public class Erasure {
     }
 }
 ```
-
 
