@@ -4,10 +4,17 @@
  */
 public enum Week {
 
-}
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURADAY,
+    SUNDAY;
 
-class Test {
     public static void main(String[] args) {
-
+        for (Week week : Week.values()) {
+            System.out.println(week);
+        }
     }
 }

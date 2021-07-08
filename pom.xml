@@ -28,7 +28,7 @@
         <module>21-concurrent</module>
         <module>50-data-structure</module>
         <module>51-algorithm</module>
-
+        <module>13-common-class</module>
 
 
     </modules>
