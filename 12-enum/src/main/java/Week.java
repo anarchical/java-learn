@@ -9,7 +9,7 @@ public enum Week {
     WEDNESDAY,
     THURSDAY,
     FRIDAY,
-    SATURADAY,
+    SATURDAY,
     SUNDAY;
 
     public static void main(String[] args) {
