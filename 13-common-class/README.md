@@ -52,7 +52,59 @@ StringBuffer 与 StringBuilder 功能相似，主要区别为 StringBuffer 是�
 
 ##### Date
 
+不推荐使用 Date 的原因：可读性差、SimpleDateFormat() 线程不安全、时区转换较复杂
+
 ##### LocalDateTime
+
+可读性好、线程安全、格式转换方便
+
+* LocalDate
+
+  只获取年月日
+
+* LocalTime
+
+  只获取时分秒
+
+* LocalDateTime
+
+  获取完整的时间信息
+
+  ```java
+  public class MyLocal {
+      public static void main(String[] args) {
+          LocalDate localDate = LocalDate.now();
+          System.out.println(localDate);
+  
+          LocalTime localTime = LocalTime.now();
+          System.out.println(localTime);
+  
+          LocalDateTime localDateTime = LocalDateTime.now();
+          System.out.println(localDateTime);
+  
+          String format = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+          System.out.println(format);
+          
+      }
+  }
+  ```
+
+* Instant
+
+  获取当前秒数，作用相当于 `System.currentTimeMillis()`
+
+  ```java
+  public class MyInstant {
+  
+      public static void main(String[] args) {
+          System.out.println(System.currentTimeMillis());
+  
+          Instant instant=Instant.now();
+          System.out.println(instant.getEpochSecond());
+          System.out.println(instant.toEpochMilli());
+      }
+  }
+  ```
 
 #### Math
 

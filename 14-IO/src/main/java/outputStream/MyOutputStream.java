@@ -2,6 +2,7 @@ package outputStream;
 
 /**
  * @author YeYaqiao
+ * 输出流
  */
 public class MyOutputStream {
 
