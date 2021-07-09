@@ -10,13 +10,13 @@ import java.io.IOException;
 public class MyFile {
     public static void main(String[] args) throws IOException {
 
-        File file=new File(System.getProperty("user.dir")+"\\14-IO\\IO.txt");
+        File file=new File(System.getProperty("user.dir")+File.separator+"14-IO"+File.separator+"IO.txt");
 
         if(file.exists()){
 
             System.out.println(file+"已存在");
             System.out.println("文件名："+file.getName());
-            System.out.println("文件长度："+file.length());
+            System.out.println("文件大小，单位为字节："+file.length());
             System.out.println("文件路径："+ file.getPath());
             System.out.println("文件所在目录："+file.getParent());
             if(file.getParentFile().isDirectory()){
