@@ -112,11 +112,12 @@
   |        |      |
   |        |      |
   |        |      |
-  
 
 #### 字符流
 
 以字符（char）为单位读取数据，常用的有输入字符流（Reader）和输出字符流（Writer）
+
+字符流 = 字节流 + 编码表
 
 ##### Reader（抽象类）
 
@@ -225,11 +226,28 @@
 * 字符缓冲输出流
 
   ```java
+  public class MyBufferedWriter {
+      public static void main(String[] args) throws IOException {
   
+          String path = System.getProperty("user.dir") + File.separator + "14-IO" + File.separator + "IO.txt";
+  
+          FileWriter fileWriter = new FileWriter(path);
+          BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+  
+          String content = "好好学习，天天向上！字符缓冲输出流\nGood Good Study,Day Day Up!";
+          bufferedWriter.write(content);
+  
+          bufferedWriter.flush();//清空缓冲区
+          fileWriter.flush();//清空缓冲区
+  
+          bufferedWriter.close();
+          fileWriter.close();
+      }
+  }
   ```
-
+  
   常用方法
-
+  
   | 方法名 | 作用 |
   | ------ | ---- |
   |        |      |
@@ -267,3 +285,4 @@
    字节流以字节为单位读取数据，字符流以字符为单位读取数据
 
    传输数据时必须要使用字节流，使用字符流会导致非字符格式的文件读取错乱
+
