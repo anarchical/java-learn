@@ -158,9 +158,13 @@ TCP/IP协议是一个网络通信模型（OSI 七层模型、TCP/IP 五次模型
 
 ##### URI
 
-
+Uniform Resource Identifier，统一资源标志符 URI 就是在某一规则下能把一个资源独一无二地**标识**出来
 
 ##### URL
+
+Uniform Resource Locator，统一资源定位系统 URL 就是在某一规则下能把一个资源独一无二地**定位**出来
+
+同样可以标识出一个资源，URL 是 URI 的子集
 
 ##### TCP
 
