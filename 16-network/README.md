@@ -168,6 +168,9 @@ Uniform Resource Locator，统一资源定位系统 URL 就是在某一规则下
 
 ##### TCP
 
+* 优点：面向连接，可靠，安全性高
+* 缺点：效率低，速度慢
+
 Java 实现 TCP 协议，通过 Socket 完成 TCP 程序的开发
 
 * server 端
@@ -255,6 +258,74 @@ Java 实现 TCP 协议，通过 Socket 完成 TCP 程序的开发
   ```
 
 ##### UDP
+
+* 优点：速度快，效率高
+* 缺点：安全性差，不可靠
+
+ClientA
+
+```java
+public class ClientA {
+    public static void main(String[] args) throws IOException {
+
+        //接收消息,初始化接收功能
+        byte[] bytes = new byte[1024];
+        DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length);
+        DatagramSocket datagramSocket = new DatagramSocket(9000);
+        //程序会阻塞在此处等待接收数据
+        datagramSocket.receive(datagramPacket);
+        String otherMsg = new String(
+                datagramPacket.getData(),
+                0,
+                datagramPacket.getLength());
+        System.out.println("ClientA 收到的消息：" + otherMsg);
+
+        //发送消息
+        String msg = "ClientA 的消息";
+        SocketAddress socketAddress = datagramPacket.getSocketAddress();
+        datagramPacket = new DatagramPacket(
+                msg.getBytes(StandardCharsets.UTF_8),
+                msg.getBytes(StandardCharsets.UTF_8).length,
+                socketAddress);
+        datagramSocket.send(datagramPacket);
+
+        datagramSocket.close();
+    }
+}
+```
+
+ClientB
+
+```java
+public class ClientB {
+    public static void main(String[] args) throws IOException {
+
+        //发送消息，封装消息内容
+        String msg = "ClientB 的消息";
+        InetAddress inetAddress = InetAddress.getByName("127.0.0.1");
+        //发送给 127.0.0.1:9000
+        DatagramPacket datagramPacket = new DatagramPacket(
+                msg.getBytes(StandardCharsets.UTF_8),
+                msg.getBytes(StandardCharsets.UTF_8).length,
+                inetAddress,
+                9000);
+
+        //初始化发送服务并发送消息
+        DatagramSocket datagramSocket = new DatagramSocket(9001);
+        datagramSocket.send(datagramPacket);
+
+        //接收消息
+        byte[] bytes = new byte[1024];
+        datagramPacket = new DatagramPacket(bytes, bytes.length);
+        datagramSocket.receive(datagramPacket);
+        String otherMsg = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+        System.out.println("ClientB 收到的消息：" + otherMsg);
+
+        datagramSocket.close();
+
+    }
+}
+```
 
 
 
