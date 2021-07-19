@@ -166,6 +166,32 @@ Uniform Resource Locator，统一资源定位系统 URL 就是在某一规则下
 
 同样可以标识出一个资源，URL 是 URI 的子集
 
+```java
+public class MyURL {
+
+    public static void main(String[] args) throws IOException {
+
+        String path = System.getProperty("user.dir") + File.separator + "16-network" + File.separator + "baidu.png";
+        String baiDuImage = "https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png";
+
+        URL url = new URL(baiDuImage);
+        InputStream inputStream = url.openStream();
+        OutputStream outputStream = new FileOutputStream(path);
+
+        System.out.println(inputStream.available());
+        int temp;
+        if ((temp = inputStream.read()) != -1) {
+            outputStream.write(temp);
+        }
+
+        outputStream.flush();
+        outputStream.close();
+        inputStream.close();
+
+    }
+}
+```
+
 ##### TCP
 
 * 优点：面向连接，可靠，安全性高
@@ -326,8 +352,6 @@ public class ClientB {
     }
 }
 ```
-
-
 
 #### 常见问题
 
