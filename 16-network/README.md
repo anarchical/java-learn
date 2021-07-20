@@ -160,6 +160,18 @@ TCP/IP协议是一个网络通信模型（OSI 七层模型、TCP/IP 五次模型
 
 Uniform Resource Identifier，统一资源标志符 URI 就是在某一规则下能把一个资源独一无二地**标识**出来
 
+```java
+public class MyURI {
+
+    public static void main(String[] args) throws URISyntaxException, MalformedURLException {
+        String path = "https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png";
+        URI uri = new URI(path);
+        System.out.println(uri.getHost());
+        System.out.println(uri.getPort());
+    }
+}
+```
+
 ##### URL
 
 Uniform Resource Locator，统一资源定位系统 URL 就是在某一规则下能把一个资源独一无二地**定位**出来
@@ -178,16 +190,17 @@ public class MyURL {
         InputStream inputStream = url.openStream();
         OutputStream outputStream = new FileOutputStream(path);
 
-        System.out.println(inputStream.available());
-        int temp;
-        if ((temp = inputStream.read()) != -1) {
-            outputStream.write(temp);
+        System.out.println("可能阻塞获取的资源大小："+inputStream.available());
+        System.out.println("实际资源的大小"+url.openConnection());
+
+        int asciiCode;
+        while ((asciiCode = inputStream.read()) != -1) {
+            outputStream.write(asciiCode);
         }
 
         outputStream.flush();
         outputStream.close();
         inputStream.close();
-
     }
 }
 ```
@@ -288,70 +301,72 @@ Java 实现 TCP 协议，通过 Socket 完成 TCP 程序的开发
 * 优点：速度快，效率高
 * 缺点：安全性差，不可靠
 
-ClientA
+Java 实现 UDP 协议，通过 DatagramSocket 完成 UDP 程序的开发
 
-```java
-public class ClientA {
-    public static void main(String[] args) throws IOException {
+* ClientA
 
-        //接收消息,初始化接收功能
-        byte[] bytes = new byte[1024];
-        DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length);
-        DatagramSocket datagramSocket = new DatagramSocket(9000);
-        //程序会阻塞在此处等待接收数据
-        datagramSocket.receive(datagramPacket);
-        String otherMsg = new String(
-                datagramPacket.getData(),
-                0,
-                datagramPacket.getLength());
-        System.out.println("ClientA 收到的消息：" + otherMsg);
+  ```java
+  public class ClientA {
+      public static void main(String[] args) throws IOException {
+  
+          //接收消息,初始化接收功能
+          byte[] bytes = new byte[1024];
+          DatagramPacket datagramPacket = new DatagramPacket(bytes, bytes.length);
+          DatagramSocket datagramSocket = new DatagramSocket(9000);
+          //程序会阻塞在此处等待接收数据
+          datagramSocket.receive(datagramPacket);
+          String otherMsg = new String(
+                  datagramPacket.getData(),
+                  0,
+                  datagramPacket.getLength());
+          System.out.println("ClientA 收到的消息：" + otherMsg);
+  
+          //发送消息
+          String msg = "ClientA 的消息";
+          SocketAddress socketAddress = datagramPacket.getSocketAddress();
+          datagramPacket = new DatagramPacket(
+                  msg.getBytes(StandardCharsets.UTF_8),
+                  msg.getBytes(StandardCharsets.UTF_8).length,
+                  socketAddress);
+          datagramSocket.send(datagramPacket);
+  
+          datagramSocket.close();
+      }
+  }
+  ```
 
-        //发送消息
-        String msg = "ClientA 的消息";
-        SocketAddress socketAddress = datagramPacket.getSocketAddress();
-        datagramPacket = new DatagramPacket(
-                msg.getBytes(StandardCharsets.UTF_8),
-                msg.getBytes(StandardCharsets.UTF_8).length,
-                socketAddress);
-        datagramSocket.send(datagramPacket);
+* ClientB
 
-        datagramSocket.close();
-    }
-}
-```
-
-ClientB
-
-```java
-public class ClientB {
-    public static void main(String[] args) throws IOException {
-
-        //发送消息，封装消息内容
-        String msg = "ClientB 的消息";
-        InetAddress inetAddress = InetAddress.getByName("127.0.0.1");
-        //发送给 127.0.0.1:9000
-        DatagramPacket datagramPacket = new DatagramPacket(
-                msg.getBytes(StandardCharsets.UTF_8),
-                msg.getBytes(StandardCharsets.UTF_8).length,
-                inetAddress,
-                9000);
-
-        //初始化发送服务并发送消息
-        DatagramSocket datagramSocket = new DatagramSocket(9001);
-        datagramSocket.send(datagramPacket);
-
-        //接收消息
-        byte[] bytes = new byte[1024];
-        datagramPacket = new DatagramPacket(bytes, bytes.length);
-        datagramSocket.receive(datagramPacket);
-        String otherMsg = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
-        System.out.println("ClientB 收到的消息：" + otherMsg);
-
-        datagramSocket.close();
-
-    }
-}
-```
+  ```java
+  public class ClientB {
+      public static void main(String[] args) throws IOException {
+  
+          //发送消息，封装消息内容
+          String msg = "ClientB 的消息";
+          InetAddress inetAddress = InetAddress.getByName("127.0.0.1");
+          //发送给 127.0.0.1:9000
+          DatagramPacket datagramPacket = new DatagramPacket(
+                  msg.getBytes(StandardCharsets.UTF_8),
+                  msg.getBytes(StandardCharsets.UTF_8).length,
+                  inetAddress,
+                  9000);
+  
+          //初始化发送服务并发送消息
+          DatagramSocket datagramSocket = new DatagramSocket(9001);
+          datagramSocket.send(datagramPacket);
+  
+          //接收消息
+          byte[] bytes = new byte[1024];
+          datagramPacket = new DatagramPacket(bytes, bytes.length);
+          datagramSocket.receive(datagramPacket);
+          String otherMsg = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+          System.out.println("ClientB 收到的消息：" + otherMsg);
+  
+          datagramSocket.close();
+  
+      }
+  }
+  ```
 
 #### 常见问题
 
@@ -383,3 +398,11 @@ public class ClientB {
 
    1. 若客户端最后一次发送完 ACK ，服务端由于网络原因没有收到，则服务端会重新发送 FIN，直到收到客户端发送的 ACK；但是若客户端最后一次发送完 ACK 后直接关闭，服务端由于网络原因没有收到，服务端就会一直重复发送 FIN 给客户端，造成服务端连接关闭失败
    2. 客户端延时关闭可以大概率保证网络中所有相关的报文都消失，一定程度上防止已经失效的报文出现在新的连接中
+   
+4. 为什么通过 URI 获取的字节流 inputStream.available() 与实际的大小不相同？
+
+   该 API 的描述是：返回可以不受阻塞地从此文件输入流中读取的字节数
+
+   由于是从网络中获取数据，所有可能存在这网络延迟等因素，导致数据流阻塞
+
+   可以使用 URLConnection.getContentLength() 获取实际的资源大小

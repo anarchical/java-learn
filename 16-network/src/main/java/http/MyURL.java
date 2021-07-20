@@ -17,15 +17,16 @@ public class MyURL {
         InputStream inputStream = url.openStream();
         OutputStream outputStream = new FileOutputStream(path);
 
-        System.out.println(inputStream.available());
-        int temp;
-        if ((temp = inputStream.read()) != -1) {
-            outputStream.write(temp);
+        System.out.println("可能阻塞获取的资源大小："+inputStream.available());
+        System.out.println("实际资源的大小"+url.openConnection().getContentLength());
+
+        int asciiCode;
+        while ((asciiCode = inputStream.read()) != -1) {
+            outputStream.write(asciiCode);
         }
 
         outputStream.flush();
         outputStream.close();
         inputStream.close();
-
     }
 }
