@@ -14,7 +14,7 @@ Class 类是用来专门描述其它类的一种类，在 java.lang 包中，其
 public class MyClass {
     public static void main(String[] args) throws ClassNotFoundException, IOException {
 
-        Class<?> clazz = Class.forName(bean);//通过全类名获取类型信息
+        Class<?> clazz = Class.forName("Dog");//通过全类名获取类型信息
         Class<Dog> clazz1 = Dog.class;//通过字面量获取类型信息
         Class<? extends Dog> clazz2 = dog.getClass();//通过对象获取类型信息
 

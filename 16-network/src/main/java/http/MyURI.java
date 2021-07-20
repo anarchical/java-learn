@@ -14,5 +14,6 @@ public class MyURI {
         URI uri = new URI(path);
         System.out.println(uri.getHost());
         System.out.println(uri.getPort());
+        System.out.println(uri.getPath());
     }
 }
