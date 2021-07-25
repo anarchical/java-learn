@@ -2,6 +2,7 @@ package servlet;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
@@ -23,6 +24,8 @@ public class MyServlet implements Servlet {
 
     @Override
     public void service(ServletRequest servletRequest, ServletResponse servletResponse) throws ServletException, IOException {
+        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+        System.out.println(httpServletRequest.getMethod());
         System.out.println("servlet service");
         servletResponse.getWriter().write("servlet success");
     }
@@ -36,4 +39,5 @@ public class MyServlet implements Servlet {
     public void destroy() {
 
     }
+
 }

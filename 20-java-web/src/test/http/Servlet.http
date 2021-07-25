@@ -1,5 +1,7 @@
 GET http://localhost:8888/servlet
 ###
+POST http://localhost:8888/servlet
+###
 GET http://localhost:8888/httpServlet
 ###
 POST http://localhost:8888/httpServlet
