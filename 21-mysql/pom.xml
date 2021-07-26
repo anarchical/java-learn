@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>21-concurrent</artifactId>
+    <artifactId>21-mysql</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
