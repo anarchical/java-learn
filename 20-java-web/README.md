@@ -56,11 +56,53 @@ Servlet 采用单例模式，Tomcat 通过反射机制来创建 Servelt 对象
 
 #### JSP
 
-Java Server Page，通过 Java 程序动态生成的 HTML 页面
+Java Server Page，通过 Java 程序动态生成的 HTML 页面 `ServletResponse.getWriter().write()`
 
-通过
+客户端通过浏览器调用服务端的 Servlet，Servlet 一行一行地读取 JSP 页面中的内容，通过 `ServletResponse.getWriter().write()` 方法将页面内容输出给客户端
+
+根据 JSP 生成的 Servlet 程序名称通常为`页面名_jsp.java`，并同时生成相应的字节码文件`页面名_jsp.class`
+
+##### 九个内置对象
+
+| 对象名 | 作用 |
+| ------ | ---- |
+|        |      |
+|        |      |
+|        |      |
+|        |      |
+|        |      |
+|        |      |
+|        |      |
+|        |      |
+|        |      |
+
+##### 四个常用对象及其方法
+
+| 对象名 | 方法 |
+| ------ | ---- |
+|        |      |
+|        |      |
+|        |      |
+|        |      |
+|        |      |
+
+##### 转发 & 重定向
 
 
+
+#### Session & Cookie
+
+
+
+##### Session
+
+
+
+##### Cookie
+
+
+
+##### 区别
 
 
 
