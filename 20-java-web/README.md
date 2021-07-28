@@ -64,31 +64,46 @@ Java Server Page，通过 Java 程序动态生成的 HTML 页面 `ServletRespons
 
 ##### 九个内置对象
 
-| 对象名 | 作用 |
-| ------ | ---- |
-|        |      |
-|        |      |
-|        |      |
-|        |      |
-|        |      |
-|        |      |
-|        |      |
-|        |      |
-|        |      |
+| 对象名      | 作用                                                         |
+| ----------- | ------------------------------------------------------------ |
+| Request     | HttpServletRequest 的一个对象，用于接收客户端的请求          |
+| Response    | HttpServletResponse 的一个对象，用于回复客户端的请求         |
+| pageContext | PageContext 的一个对象，页面上下文，用于获取页面信息         |
+| Session     | HttpSession 的一个对象，代表浏览器和服务器间的一次会话，用于保存客户端用户的信息 |
+| Application | ServletContext 的一个对象，代表当前 Web 应用，全局对象，保存着所有客户端用户的共享数据 |
+| Config      | 当前 JSP 对应的 Servlet 的 ServletConfig 对象，用于获取当前 Servlet 的信息 |
+| Out         | JspWriter 的一个对象，用于向客户端输出信息，相当于 Servlet 的输出流 |
+| Page        | 当前 JSP 对应的 Servlet 对象                                 |
+| Exception   | 表示当前 JSP 页面发生的异常                                  |
 
 ##### 四个常用对象及其方法
 
-| 对象名 | 方法 |
-| ------ | ---- |
-|        |      |
-|        |      |
-|        |      |
-|        |      |
-|        |      |
+| 对象名      | 常用方法                                                     |
+| ----------- | ------------------------------------------------------------ |
+| Request     | 1. `String getParameters(String name)` 用于获取前端传来的参数<br />2. `void setAttribute(String name, Object value)` 通过键值对的形式保存数据<br />3. `Object getAttribute(String name)` 通过键名获取数据<br />4. `String[] getParameterValues(String name)` 获取前端传来的多个参数<br />5. `void setCharacterEncoding(String charset)` 设置请求的编码<br />6. `RequsetDispatcher getRequestDispatcher(String path)` 返回一个 RequestDispatcher 对象，该对象的 forward() 方法用来完成转发 |
+| Response    | 1. `void setCharacterEncoding(String charset)` 设置请求的编码<br />2. `void sendRedirect(String path)` 页面重定向<br />3. `void getWriter().writer(String s)` 向客户端返回信息 |
+| Session     |                                                              |
+| Application |                                                              |
 
 ##### 转发 & 重定向
 
+转发（RequsetDispatcher.forward）和重定向（sendRedirect）都是用来完成对资源的转发，从某个资源跳转到另一个资源（Servlet、JSP）
 
+区别：
+
+* 转发（forwoard）
+
+  转发是同一个请求（服务端跳转）
+
+  服务器将客户端的请求指向另外一个资源，跳转过程由服务器完成；对于客户端而言还是同一个请求；地址栏信息不会发生变化
+
+* 重定向（redirect）
+
+  重定向是两个不同的请求（客户端跳转）
+
+  相当于服务器拒绝了当前的客户端请求，并让客户端发起一个新的请求去访问另一个资源；地址栏信息会发生改变
+
+注意：如果使用了 request 进行参数传递，必须在转发的情况下才能获取数据；如果是重定向的话，request 并不是客户端原本请求的内容，可能会发生错误
 
 #### Session & Cookie
 
