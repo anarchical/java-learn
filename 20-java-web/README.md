@@ -64,26 +64,28 @@ Java Server Page，通过 Java 程序动态生成的 HTML 页面 `ServletRespons
 
 ##### 九个内置对象
 
+jsp 内置对象，在 jsp 页面中可以直接使用，无需手动创建
+
 | 对象名      | 作用                                                         |
 | ----------- | ------------------------------------------------------------ |
-| Request     | HttpServletRequest 的一个对象，用于接收客户端的请求          |
-| Response    | HttpServletResponse 的一个对象，用于回复客户端的请求         |
+| request     | HttpServletRequest 的一个对象，用于接收客户端的请求          |
+| response    | HttpServletResponse 的一个对象，用于回复客户端的请求         |
 | pageContext | PageContext 的一个对象，页面上下文，用于获取页面信息         |
-| Session     | HttpSession 的一个对象，代表浏览器和服务器间的一次会话，用于保存客户端用户的信息 |
-| Application | ServletContext 的一个对象，代表当前 Web 应用，全局对象，保存着所有客户端用户的共享数据 |
-| Config      | 当前 JSP 对应的 Servlet 的 ServletConfig 对象，用于获取当前 Servlet 的信息 |
-| Out         | JspWriter 的一个对象，用于向客户端输出信息，相当于 Servlet 的输出流 |
-| Page        | 当前 JSP 对应的 Servlet 对象                                 |
-| Exception   | 表示当前 JSP 页面发生的异常                                  |
+| session     | HttpSession 的一个对象，代表浏览器和服务器间的一次会话，用于保存客户端用户的信息 |
+| application | ServletContext 的一个对象，代表当前 Web 应用，全局对象，保存着所有客户端用户的共享数据 |
+| config      | 当前 JSP 对应的 Servlet 的 ServletConfig 对象，用于获取当前 Servlet 的信息 |
+| out         | JspWriter 的一个对象，用于向客户端输出信息，相当于 Servlet 的输出流 |
+| page        | 当前 JSP 对应的 Servlet 对象                                 |
+| exception   | 表示当前 JSP 页面发生的异常                                  |
 
 ##### 四个常用对象及其方法
 
 | 对象名      | 常用方法                                                     |
 | ----------- | ------------------------------------------------------------ |
-| Request     | 1. `String getParameters(String name)` 用于获取前端传来的参数<br />2. `void setAttribute(String name, Object value)` 通过键值对的形式保存数据<br />3. `Object getAttribute(String name)` 通过键名获取数据<br />4. `String[] getParameterValues(String name)` 获取前端传来的多个参数<br />5. `void setCharacterEncoding(String charset)` 设置请求的编码<br />6. `RequsetDispatcher getRequestDispatcher(String path)` 返回一个 RequestDispatcher 对象，该对象的 forward() 方法用来完成转发 |
-| Response    | 1. `void setCharacterEncoding(String charset)` 设置请求的编码<br />2. `void sendRedirect(String path)` 页面重定向<br />3. `void getWriter().writer(String s)` 向客户端返回信息 |
-| Session     |                                                              |
-| Application |                                                              |
+| request     | 1. `String getParameters(String name)` 用于获取前端通过 url 传来的参数<br />2. `void setAttribute(String name, Object value)` 通过键值对的形式保存数据<br />3. `Object getAttribute(String name)` 通过键名获取数据<br />4. `String[] getParameterValues(String name)` 获取前端传来的多个参数<br />5. `void setCharacterEncoding(String charset)` 设置请求的编码<br />6. `RequsetDispatcher getRequestDispatcher(String path)` 返回一个 RequestDispatcher 对象，该对象的 forward() 方法用来完成转发 |
+| response    | 1. `void setCharacterEncoding(String charset)` 设置请求的编码<br />2. `void sendRedirect(String path)` 页面重定向<br />3. `void getWriter().writer(String s)` 向客户端返回页面信息 |
+| session     |                                                              |
+| application |                                                              |
 
 ##### 转发 & 重定向
 
@@ -103,22 +105,71 @@ Java Server Page，通过 Java 程序动态生成的 HTML 页面 `ServletRespons
 
   相当于服务器拒绝了当前的客户端请求，并让客户端发起一个新的请求去访问另一个资源；地址栏信息会发生改变
 
-注意：如果使用了 request 进行参数传递，必须在转发的情况下才能获取数据；如果是重定向的话，request 并不是客户端原本请求的内容，可能会发生错误
+对于增删改类的操作，应使用重定向，防止重复提交请求；对于查询类操作则可以使用转发
+
+注意：如果使用了 request 进行参数传递，必须在转发的情况下才能获取数据；如果是重定向的话，request 并不是客户端原本请求的内容，可能会发生错误；转发是对同一个 Servlet 对象进行访问，重定向是访问了两个不同的对象
 
 #### Session & Cookie
 
+服务器无法识别出 HTTP 请求的来源，就需要一种技术来区别来自不同的客户端请求，这种机制就是会话
 
+会话：打开浏览器客户端并与服务器之间发生的一系列的请求与响应、直到关闭浏览器客户端的全过程
+
+实现会话的技术：
+
+* session 服务器技术，存储于服务器
+* cookie 客户端技术，存储于浏览器客户端
 
 ##### Session
 
+session 是 jsp 提供的内置对象之一，可以在 jsp 页面中直接使用
 
+session 表示浏览器客户端与服务器产生的一次会话，只要浏览器不关闭，其中所有的页面使用的都是服务器提供的同一个 session
+
+| 常用方法名                                  | 作用                                                         |
+| ------------------------------------------- | ------------------------------------------------------------ |
+| String gitId()                              | 获取 session 的 id，服务器通过 session id 来区别不同的客户端 |
+| void setMaxInactiveInterval(int interval)   | 设置 session 的失效时间，单位为秒                            |
+| int getMaxInactiveInterval()                | 获取 session 的有效时间，默认时间为 30 分钟                  |
+| void invalidate()                           | 设置 session 失效                                            |
+| void setAttribute(String key, Object value) | 向 session 中通过键值对的形式存储数据                        |
+| Object getAttribute(String key)             | 通过 key 取出数据                                            |
+| void removeAttribute(String key)            | 通过 key 删除对应的 value                                    |
 
 ##### Cookie
 
+Cookie 是一个文本类型的文件，存储于浏览器客户端中
 
+当服务器响应浏览器客户端的请求时，会同时传给浏览器客户端一个文本文件，就是 cookie；浏览器保存这个 cookie 并使用其中的数据，并且在每次请求服务器时，都会把 cookie 传回给服务器
+
+cookie 就是这样不断的在服务器和浏览器之间传递，达到数据传递的效果
+
+| 常用方法名                  | 作用                         |
+| --------------------------- | ---------------------------- |
+| void setMaxAge(int age)     | 设置 cookie 有效期，单位为秒 |
+| int getMaxAge()             | 获取 cookie 有效期           |
+| void setValue(String value) | 对 cookie 进行赋值           |
+| String getName()            | 获取 cookie 的name           |
+| String getValue             | 获取 cookie 的 value         |
+| request.getCookies()        | 获取 cookie 列表             |
 
 ##### 区别
 
+* 存储位置：session 存在服务器中；cookie 存在浏览器客户端中
+* 存储类型：session 可以存储任意类型的数据；cookie 只能存储文本类型数据
+* 销毁机制：session 随着会话的结束而被销毁，cookie 可以长期保存在客户端
+* 应用方式：session 安全性较高，用于存储重要的信息；cookie 用于存储不重要的信息
 
+#### 过滤器
+
+服务器用于拦截请求或响应，用于于登录判断或权限校验
+
+#### EL 表达式
+
+Expression Language 表达式语言
+
+可以替代 JSP 页面中数据访问的复杂编码，简化代码
+
+语法：${目标数据的 key}
 
 #### 常见问题

@@ -28,8 +28,6 @@ public class RequestServlet extends HttpServlet {
         String method = new String(req.getParameter("method").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
         System.out.println(method);
 
-        //向客户端返回信息
-        resp.getWriter().write("doGet response");
     }
 
     @Override

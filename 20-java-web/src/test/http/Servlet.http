@@ -12,3 +12,12 @@ POST http://localhost:8888/httpServlet
 GET http://localhost:8888/request?method=Get 方法
 ###
 POST http://localhost:8888/request?method=Post 方法
+
+###
+GET http://localhost:8888/session
+###
+GET http://localhost:8888/session.jsp
+###
+GET http://localhost:8888/cookie.jsp
+###
+GET http://localhost:8888/cookie
