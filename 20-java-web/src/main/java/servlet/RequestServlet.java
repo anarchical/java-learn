@@ -20,7 +20,7 @@ public class RequestServlet extends HttpServlet {
         String result = "Hello World! 你好，世界！";
         //将键值对信息通过 HttpServletRequest 存入 servlet
         req.setAttribute("result", result);
-        //页面重定向到 request.jsp
+        //页面转发到 request.jsp
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("request.jsp");
         requestDispatcher.forward(req, resp);
 
@@ -38,6 +38,7 @@ public class RequestServlet extends HttpServlet {
         System.out.println(method);
         //向客户端返回信息
         resp.getWriter().write("doPost response");
+        //页面重定向
         resp.sendRedirect("redirect.jsp");
     }
 }

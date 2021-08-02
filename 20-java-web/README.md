@@ -162,7 +162,41 @@ cookie 就是这样不断的在服务器和浏览器之间传递，达到数据�
 
 #### 过滤器
 
-服务器用于拦截请求或响应，用于于登录判断或权限校验
+服务器用于拦截请求或响应，用于于登录判断或权限校验，校验通过以后再发送目标资源
+
+```java
+@WebFilter("/session-login/index.jsp")
+public class LoginFilter implements Filter {
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+    }
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        HttpSession session = request.getSession();
+        String username = (String) session.getAttribute("username");
+        //判断是否登录
+        if (username == null) {
+            //重定向
+            response.sendRedirect("session-login/login.jsp");
+        } else {
+            //放行
+            filterChain.doFilter(servletRequest, servletResponse);
+        }
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+}
+```
 
 #### EL 表达式
 
@@ -171,5 +205,7 @@ Expression Language 表达式语言
 可以替代 JSP 页面中数据访问的复杂编码，简化代码
 
 语法：${目标数据的 key}
+
+注：若 EL 表达式不生效，则需要声明开启使用 `<%@ page isELIgnored="false"%>`
 
 #### 常见问题
