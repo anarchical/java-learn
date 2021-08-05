@@ -44,7 +44,11 @@ SQL（Structured Query Language） NoSQL（Not Only SQL）
 ```mysql
 ```
 
+##### 索引
 
+用于提高 mysql 检索速度；索引也是一张表，保存了主键和索引字段
+
+索引的底层结构为 B+ 树
 
 ##### 事务
 
