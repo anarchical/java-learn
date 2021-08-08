@@ -1,7 +1,5 @@
 -- 创建数据库 mysql_learn
 create database if not exists mysql_learn;
--- 删除数据库 mysql_learn
--- drop database if exists mysql_learn;
 
 -- 创建课程表 course
 create table mysql_learn.course

@@ -20,29 +20,155 @@ SQL（Structured Query Language） NoSQL（Not Only SQL）
 
 ##### 数据类型
 
-| 类型 | 大小 | 范围（有符号） | 范围（无符号） | 用途 |
-| ---- | ---- | -------------- | -------------- | ---- |
-|      |      |                |                |      |
-|      |      |                |                |      |
-|      |      |                |                |      |
-|      |      |                |                |      |
-|      |      |                |                |      |
-|      |      |                |                |      |
-|      |      |                |                |      |
-|      |      |                |                |      |
+mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
 
+* 数值类型
 
+  | 类型名    | 描述           |
+  | --------- | -------------- |
+  | tinyint   | 小整数值       |
+  | smallint  | 大整数值       |
+  | mediumint | 大整数值       |
+  | int       | 大整数值       |
+  | bigint    | 极大整数值     |
+  | float     | 单精度浮点小数 |
+  | double    | 双精度浮点小数 |
+  | decimal   | 高精度小数     |
+
+* 日期和时间类型
+
+  | 类型名    | 描述               |
+| --------- | ------------------ |
+  | date      | 日期值             |
+| time      | 时间值             |
+  | year      | 年份值             |
+| datetime  | 混合日期时间年份值 |
+  | timestamp | 时间戳             |
+
+* 字符串类型
+
+  | 类型名     | 描述                            |
+| ---------- | ------------------------------- |
+  | char       | 定长字符串                      |
+| varchar    | 变长字符串                      |
+  | tinyblob   | 不超过 255 个字符的二进制字符串 |
+| tinytext   | 短文本字符串                    |
+  | blob       | 二进制形式的长文本数据          |
+| text       | 长文本数据                      |
+  | mediumblob | 二进制形式的中等长度文本数据    |
+| mediumtext | 中等长度文本数据                |
+  | longblob   | 二进制形式的极大文本数据        |
+| longtext   | 极大文本数据                    |
 
 ##### 运算符
 
-```mysql
+* 算术运算符
 
-```
+  ```mysql
+  -- 加法
+  select 1+2;
+  -- 减法
+  select 2-1;
+  -- 乘法
+  select 2*3;
+  -- 除法(div 保留整数，/ 保留4位小数)
+  select 4/2;
+  select 4 div 2;
+  -- 取余
+  select 10 mod 3;
+  ```
+
+* 比较运算符
+
+  ```mysql
+  ```
+
+* 逻辑运算符
+
+  ```mysql
+  
+  ```
+
+* 位运算符
+
+  ```mysql
+  
+  ```
 
 ##### 函数
 
-```mysql
-```
+* 字符串函数
+
+  ```mysql
+  -- 字符串 s2 替换 s1 的 x 位置开始长度为 len 的字符串（以1位开头，而不是0）
+  select insert('hello world', 7, 5, 'mysql');
+  -- 将字母转为大写
+  select upper('string');
+  -- 将字母转为小写
+  select lower('STRING');
+  -- 获取字符串 s 前 len 个字符
+  select left('hello world', 5);
+  -- 获取字符串 s 后 len 个字符
+  select right('hello world', 5);
+  -- 从 index 开始截取 len 个字符
+  select substring('hello world', 5, 3);
+  -- 获取字符串的逆序
+  select reverse('hello world');
+  ```
+
+* 数字函数
+
+  ```mysql
+  -- 获取参数的绝对值
+  select abs(-10);
+  -- 获取小于参数的最大整数
+  select floor(1.5);
+  -- 获取大于参数的最大整数
+  select ceil(1.5);
+  ```
+
+* 日期函数
+
+  ```mysql
+  -- 获取当前日期
+  select curdate();
+  -- 获取当前时间
+  select curtime();
+  -- 获取当前日期和时间
+  select now();
+  ```
+
+* 高级函数
+
+  ```mysql
+  
+  ```
+
+##### 增删改查（CRUD）
+
+* create
+
+  ```mysql
+  
+  ```
+
+* read
+
+  ```mysql
+  
+  ```
+
+* update
+
+  ```mysql
+  
+  ```
+
+* delete
+
+  ```mysql
+  
+  ```
 
 ##### 索引
 
