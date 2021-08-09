@@ -81,6 +81,38 @@ mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
 * 比较运算符
 
   ```mysql
+  -- 0 表示 false，1 表示 true
+  -- 等于 = （有一边为则结果为 NULL ）
+  select 1 = 2;
+  -- 不等于 <>, !=
+  select 1 <> 2;
+  select 1 != 2;
+  -- 安全等于 <=> （当两边为 NULL 时，结果为 1，有一边为 NULL 时，结果为 0）
+  select null <=> null;
+  -- 小于 <
+  select 1 < 2;
+  -- 小于等于 <=
+  select 1 <= 2;
+  -- 大于 >
+  select 1 > 2;
+  -- 大于等于 >=
+  select 1 >= 2;
+  -- 在两值之间 between
+  select 3 between 1 and 5;
+  -- 不在两值之间 not between
+  select 3 not between 1 and 5;
+  -- 在集合中 in
+  select 5 in (1, 2, 3, 4, 5, 6);
+  -- 不在集合中 not in
+  select 5 not in (1, 2, 3, 4, 5, 6);
+  -- 模糊匹配 like
+  select 'mysql' like '%sql';
+  -- 正则匹配 regexp, rlike
+  select 'mysql' regexp 'sql';
+  -- 为空 is null
+  select null is null;
+  -- 不为空 is not null
+  select null is not null;
   ```
 
 * 逻辑运算符
@@ -119,12 +151,22 @@ mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
 * 数字函数
 
   ```mysql
-  -- 获取参数的绝对值
+  -- 获取参数的绝对值 abs
   select abs(-10);
-  -- 获取小于参数的最大整数
+  -- 获取小于参数的最大整数 floor
   select floor(1.5);
-  -- 获取大于参数的最大整数
+  -- 获取大于参数的最小整数 ceil
   select ceil(1.5);
+  -- 获取查询结果指定字段的总记录数 count
+  select count(name) from mysql_learn.course;
+  -- 计算某个字段的总和 sum
+  select sum(id) from mysql_learn.course;
+  -- 计算某个字段的平均值
+  select avg(id) from mysql_learn.course;
+  -- 获取某个字段所有记录中的最大值
+  select max(id) from mysql_learn.course;
+  -- 获取某个字段所有记录中的最小值
+  select min(id) from mysql_learn.course;
   ```
 
 * 日期函数
@@ -136,6 +178,12 @@ mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
   select curtime();
   -- 获取当前日期和时间
   select now();
+  -- 获取指定日期n天后的日期
+  select adddate('2020-01-01',100);
+  -- 获取指定日期n天前的日期
+  select subdate('2020-04-10',100);
+  -- 获取两天之间相隔的天数
+  select datediff('2020-04-10','2020-01-01');
   ```
 
 * 高级函数
@@ -149,25 +197,66 @@ mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
 * create
 
   ```mysql
+  -- 创建数据库 mysql_learn
+  create database if not exists mysql_learn;
   
+  -- 创建课程表 course
+  create table mysql_learn.course
+  (
+      id   int,
+      name varchar(2),
+      primary key (id)
+  ) engine = InnoDB
+    default charset = utf8;
+  
+  -- 创建学生表 student
+  create table mysql_learn.student
+  (
+      id   int,
+      name varchar(3),
+      primary key (id)
+  );
+  
+  -- 插入数据
+  insert into mysql_learn.student(id, name)
+  values (2, '张三');
   ```
 
 * read
 
   ```mysql
-  
+  -- 按条件查询一条数据
+  select * from mysql_learn.course where id = 2;
+  -- 查询一条数据
+  select * from mysql_learn.course limit 1;
+  -- 查询全部数据
+  select * from mysql_learn.course;
   ```
 
 * update
 
   ```mysql
-  
+  -- 新增字段
+  alter table mysql_learn.course add teacher varchar(10);
+  -- 修改字段
+  alter table mysql_learn.course modify teacher varchar(5);
+  alter table mysql_learn.course change teacher teachers varchar(2);
+  -- 修改字段位置
+  alter table mysql_learn.course modify teacher varchar(5) first ;
+  alter table mysql_learn.course modify teacher varchar(5) after name;
+  -- 删除一列
+  alter table mysql_learn.course drop teacher;
   ```
 
 * delete
 
   ```mysql
-  
+  -- 删除数据库
+  drop database if exists mysql_learn;
+  -- 删除表
+  drop table if exists mysql_learn.student;
+  -- 删除一行
+  delete from mysql_learn.course where id = 1;
   ```
 
 ##### 索引
