@@ -28,7 +28,8 @@
         <module>16-network</module>
         <module>15-lambda</module>
         <module>20-java-web</module>
-        <module>21-JDBC</module>
+        <module>21-mysql</module>
+        <module>22-JDBC</module>
         <module>21-patterns</module>
         <module>50-data-structure</module>
         <module>51-algorithm</module>

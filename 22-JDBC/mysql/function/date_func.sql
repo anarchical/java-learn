@@ -1,0 +1,12 @@
+-- 获取当前日期
+select curdate();
+-- 获取当前时间
+select curtime();
+-- 获取当前日期和时间
+select now();
+-- 获取指定日期n天后的日期
+select adddate('2020-01-01',100);
+-- 获取指定日期n天前的日期
+select subdate('2020-04-10',100);
+-- 获取两天之间相隔的天数
+select datediff('2020-04-10','2020-01-01');
