@@ -371,7 +371,28 @@ alter table table_name
 
 ##### SQL
 
-结构化查询语言（Structured Query Language）
+结构化查询语言（Structured Query Language），主要分为四类
+
+* DDL（Data Definition Language 数据定义语言）
+
+  create、drop、alter
+
+* DQL（Data Query Language 数据查询语言）
+
+  select、where
+
+* DML（Data Manipulation Language 数据操作语言）
+
+  insert、update、delete 
+
+* DCL / TCL（Data Control Language 数据控制语言/Transaction Control Language 事务控制语言）
+
+  commit、rollback
+
+```mysql
+```
+
+
 
 ##### 事务
 
