@@ -118,13 +118,32 @@ mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
 * 逻辑运算符
 
   ```mysql
-  
+  -- 逻辑非 not, !
+  select not 1;
+  select !0;
+  -- 逻辑与 and
+  select 2 and 0;
+  -- 逻辑或 or
+  select 1 or 0;
+  -- 逻辑异或 xor
+  select null xor 1;
   ```
 
 * 位运算符
 
   ```mysql
-  
+  -- 按位与 &
+  select 1&0;
+  -- 按位或 |
+  select 1|0;
+  -- 按位异或 ^
+  select 1^0;
+  -- 按位取反 !
+  select !0;
+  -- 左移 <<
+  select 1<<1;
+  -- 右移 >>
+  select 1>>1;
   ```
 
 ##### 函数
@@ -189,7 +208,8 @@ mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
 * 高级函数
 
   ```mysql
-  
+  -- 判断参数是否为空
+  select isnull(null);
   ```
 
 ##### 增删改查（CRUD）
@@ -259,11 +279,99 @@ mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
   delete from mysql_learn.course where id = 1;
   ```
 
+
+
 ##### 索引
 
-用于提高 mysql 检索速度；索引也是一张表，保存了主键和索引字段
+用于提高 mysql 检索速度；索引也是一张表，保存了索引信息和对应的记录所存在的磁盘地址
 
-索引的底层结构为 B+ 树
+索引加快检索速度的同时，创建和维护索引也消耗了物理空间，滥用索引会导致检索速度下降
+
+###### 索引结构
+
+索引的底层结构为 B+ 树，原因如下：
+
+* 二叉树：有序插入元素时，二叉树会退化成链表，并且树的高度不可控
+
+* 红黑树：平衡二叉树，虽然能防止退化成链表，但是数据量过大的情况下树会过高，导致查询效率降低
+
+* B 树：多路搜索树，保证树平衡的同时，降低树的高度
+
+* B+ 树：对 B 树的优化，是一种冗余的数据结构；将数据信息只存放在叶子结点（这样非叶子节点就能存储更多的索引信息），叶子节点之间加了指针形成链表；非叶子结点只存放索引信息和数据的地址信息
+
+  MySQL 分配给每一级的空间时 16KB，而非叶子节点的大小是 14 byte，所以非叶子节点可以存储 16KB/14 byte = 1170 个索引
+
+  叶子节点会同时存储索引信息和数据的地址信息，每个结点占 1KB ，所以每一层能存 16 个元素
+
+  则三层的 B+ 树结构可以存储  1170 * 1170 * 16 = 2190 w 条索引信息
+
+###### 索引分类
+
+* 普通索引：
+
+  索引内容可以重复，可以为 null
+
+* 唯一性索引：
+
+  索引值是唯一的，索引内容可以为 null（添加主键时默认创建唯一索引，但主键索引不能为 null）
+
+* 全文索引：
+
+  只能创建再 char、varchar、text 数据类型的字段上，在查询数据量较大的字符串类型的字段时，可以使用全文索引提高查询效率；mysql5.6 之前 InnoDB 不支持全文索引
+
+* 单列索引：
+
+  把索引添加到一个字段上
+
+* 多列索引：
+
+  把索引添加到多个字段上
+
+* 空间索引
+
+  建立在空间数据类型上的索引（GIS，地理信息系统）；mysql5.7 之前 InnoDB 不支持空间索引
+
+###### 索引的相关操作
+
+```mysql
+-- 显示索引信息 \G 用来格式化输出信息
+show index from table_name;
+-- 创建索引
+create index index_name on table_name (column_name);
+-- 创建表的时候指定索引
+create table table_name
+(
+    id          int         not null,
+    column_name varchar(16) not null,
+    index index_name (id)
+);
+-- 修改表结构创建索引
+alter table table_name
+    add index index_name (column_name);
+-- 删除索引
+drop index index_name on table_name;
+-- 创建唯一索引
+create unique index index_name on table_name (column_name);
+-- 创建表的时候指定唯一索引
+create table table_name
+(
+    id          int        not null,
+    column_name varchar(8) not null,
+    unique index_name (column_name)
+);
+-- 修改表结构创建索引
+alter table table_name
+    add unique index index_name (column_name);
+-- 创建组合索引
+create index index_name on table_name (id, column_name);
+-- 添加全文索引
+alter table table_name
+    add fulltext index_name (column_name);
+```
+
+##### SQL
+
+结构化查询语言（Structured Query Language）
 
 ##### 事务
 
@@ -298,3 +406,8 @@ Transaction，指访问并可能更新数据库中各种数据项的一个程序
 Java DataBase Connection
 
 java 语言连接数据库的一种技术
+
+
+
+#### 常见问题
+
