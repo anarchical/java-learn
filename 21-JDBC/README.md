@@ -212,75 +212,6 @@ mysql 数据类型分为 数值类型、日期和时间类型、字符串类型
   select isnull(null);
   ```
 
-##### 增删改查（CRUD）
-
-* create
-
-  ```mysql
-  -- 创建数据库 mysql_learn
-  create database if not exists mysql_learn;
-  
-  -- 创建课程表 course
-  create table mysql_learn.course
-  (
-      id   int,
-      name varchar(2),
-      primary key (id)
-  ) engine = InnoDB
-    default charset = utf8;
-  
-  -- 创建学生表 student
-  create table mysql_learn.student
-  (
-      id   int,
-      name varchar(3),
-      primary key (id)
-  );
-  
-  -- 插入数据
-  insert into mysql_learn.student(id, name)
-  values (2, '张三');
-  ```
-
-* read
-
-  ```mysql
-  -- 按条件查询一条数据
-  select * from mysql_learn.course where id = 2;
-  -- 查询一条数据
-  select * from mysql_learn.course limit 1;
-  -- 查询全部数据
-  select * from mysql_learn.course;
-  ```
-
-* update
-
-  ```mysql
-  -- 新增字段
-  alter table mysql_learn.course add teacher varchar(10);
-  -- 修改字段
-  alter table mysql_learn.course modify teacher varchar(5);
-  alter table mysql_learn.course change teacher teachers varchar(2);
-  -- 修改字段位置
-  alter table mysql_learn.course modify teacher varchar(5) first ;
-  alter table mysql_learn.course modify teacher varchar(5) after name;
-  -- 删除一列
-  alter table mysql_learn.course drop teacher;
-  ```
-
-* delete
-
-  ```mysql
-  -- 删除数据库
-  drop database if exists mysql_learn;
-  -- 删除表
-  drop table if exists mysql_learn.student;
-  -- 删除一行
-  delete from mysql_learn.course where id = 1;
-  ```
-
-
-
 ##### 索引
 
 用于提高 mysql 检索速度；索引也是一张表，保存了索引信息和对应的记录所存在的磁盘地址
@@ -389,10 +320,119 @@ alter table table_name
 
   commit、rollback
 
-```mysql
-```
+##### 增删改查（CRUD）
 
+* create
 
+  ```mysql
+  -- 创建数据库 mysql_learn
+  create database if not exists mysql_learn;
+  
+  -- 创建课程表 course，auto_increment 表示自增，default 表示设置默认值
+  create table mysql_learn.course
+  (
+      id   int auto_increment comment 'id唯一标识',
+      name varchar(16) default '课程名',
+      primary key (id)
+  ) engine = InnoDB
+    default charset = utf8;
+  
+  -- 创建学生表 student
+  create table mysql_learn.student
+  (
+      id   int,
+      name varchar(3),
+      primary key (id)
+  );
+  
+  -- 插入数据
+  insert into mysql_learn.student(id, name)
+  values (2, '张三');
+  
+  insert into mysql_learn.course(name)
+  values ('Java 程序设计');
+  
+  insert into mysql_learn.course(name)
+  values ('MySQL 数据库')
+  ```
+
+* read
+
+  ```mysql
+  -- 查看表结构
+  desc course;
+  -- 按条件查询一条数据
+  select *
+  from mysql_learn.course
+  where id = 2;
+  -- 查询一条数据
+  select *
+  from mysql_learn.course
+  limit 1;
+  -- 查询全部数据
+  select *
+  from mysql_learn.course;
+  ```
+
+* update
+
+  ```mysql
+  -- 新增字段
+  alter table mysql_learn.course
+      add teacher varchar(10);
+  -- 修改字段
+  alter table mysql_learn.course
+      modify teacher varchar(5);
+  alter table mysql_learn.course
+      change teacher teachers varchar(2);
+  -- 修改字段位置
+  alter table mysql_learn.course
+      modify teacher varchar(5) first;
+  alter table mysql_learn.course
+      modify teacher varchar(5) after name;
+  -- 删除一列
+  alter table mysql_learn.course
+      drop teacher;
+  -- 生成主键
+  alter table course
+      add constraint primary key (id);
+  -- 生成自增约束
+  alter table course
+      modify id int auto_increment;
+  -- 生成非空约束
+  alter table student
+      modify id int not null;
+  -- 删除默认值
+  alter table course
+      alter column id drop default;
+  -- 设置默认值
+  alter table course
+      alter column name set default 'course_name';
+  ```
+
+* delete
+
+  ```mysql
+  -- 删除数据库
+  drop database if exists mysql_learn;
+  -- 删除表
+  drop table if exists mysql_learn.student;
+  -- 删除一行
+  delete
+  from mysql_learn.course
+  where id = 1;
+  -- 删除主键自增约束
+  alter table course modify id int;
+  -- 删除主键
+  alter table course
+      drop constraint `PRIMARY`;
+  -- 删除主键（如果主键有约束，则先删除约束）
+  alter table student
+      drop primary key;
+  -- 删除非空约束
+  alter table course
+      modify id int null;
+  ```
 
 ##### 事务
 
