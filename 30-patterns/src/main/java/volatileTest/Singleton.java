@@ -6,7 +6,7 @@ package volatileTest;
  */
 public class Singleton {
 
-    private volatile static Singleton singleton;//工作内存可见
+    private volatile static Singleton singleton;//volatile 工作内存可见
 
     private Singleton() {
     }
@@ -22,6 +22,14 @@ public class Singleton {
         }
 
         return singleton;
+    }
+
+    private final String name = "Singleton";
+
+    public static void main(String[] args) {
+        Singleton singleton = Singleton.getInstance();
+        System.out.println(singleton);
+        System.out.println(singleton.name);
     }
 
 }
