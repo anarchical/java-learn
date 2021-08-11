@@ -26,4 +26,4 @@ insert into mysql_learn.course(name)
 values ('Java 程序设计');
 
 insert into mysql_learn.course(name)
-values ('MySQL 数据库')
+values ('MySQL 数据库');
