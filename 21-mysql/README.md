@@ -315,6 +315,139 @@ alter table table_name
     add fulltext index_name (column_name);
 ```
 
+#### 键
+
+##### 主键（primary key）
+
+主键是唯一的，用于标识条数据的唯一性
+
+##### 外键（foreign key）
+
+外键用于关联两个表；一般情况下一个表中的外键通常是另一个表中的主键
+
+数据表之间一般有三种关系：
+
+* 一对一：
+
+  A表中的一条记录对应B表中的一条记录，并且B表中的一条记录也对应A表中的一条记录
+
+  （例如人和身份证号一一对应，实际开发中一般不会使用一对一关系，完全可以合成一张表）
+
+* 一对多：
+
+  A表中的一条记录对应B表中的多条记录，并且B表中的一条记录对应A表中的一条记录
+
+  （例如学生和班级，一个学生只能对应一个班级，但是一个班级可以对应多个学生）
+
+* 多对多：
+
+  A表中的一条记录对应B表中的多个记录，并且B表中的一个条记录也对应A表中的多条记录
+
+  （例如选课，一个学生可以有多个课程信息，一个课程也可以有多个学生选）
+###### 一对多
+
+一般为主从关系，主表为一的一方，从表为多的一方（如学生班级关系，班级可以设置成主表，学生设置成从表）
+
+从表中设置的外键一般为主表中的主键
+
+```mysql
+-- 生成外键
+create table class(
+    id int primary key auto_increment,
+    name varchar(16) not null
+);
+
+create table student(
+    id int primary key  auto_increment,
+    name varchar(16) not null ,
+    class_id int null,
+    foreign key(class_id)  references class(id)
+);
+
+-- 指定外键名添加外键
+alter table student
+    add constraint class_key foreign key (class_id) references class (id);
+
+-- 删除外键
+alter table student
+    drop foreign key student_ibfk_1;
+
+```
+
+实际开发中一班不生成外键约束，因为需要耗费额外的资源对约束关系进行维护，同时会导致主表中被引用的数据无法被删除
+
+###### 多对多
+
+多对多关系需要借助一张中间表来完成两张之间的关系映射
+
+两张表都为主表，中间表为从表，添加两张表的主键作为外键
+
+#### 查询
+
+##### 多表关联查询
+
+* 嵌套查询
+
+  ```mysql
+  -- 查询张三所在的班级
+  select *
+  from class
+  where id = (select class_id from student where name = '张三');
+  ```
+
+* 连接查询
+
+  * 内连接（inner join）
+
+    也叫笛卡尔积查询，查询时将两张表的所有信息进行关联（将两张表的所有数据进行组合，通过 where 进行条件过滤）
+
+    ```mysql
+    -- 内连接查询张三所在的班级
+    select *
+    from student
+             inner join class
+    where student.name = '张三'
+      and student.class_id = class.id;
+    ```
+
+  * 外连接
+
+    * 左连接（left join）
+
+      将左表的所有数据和右表满足条件的数据进行组合
+
+      ```mysql
+      -- 左连接查询
+      select * from student left join class on class.id = student.class_id;
+      ```
+
+    * 右连接（right join）
+
+      将右表的所有数据和左表满足条件的数据进行组合
+
+      ```mysql
+      -- 右连接查询
+      select * from class right join student  on class.id = student.class_id;
+      ```
+
+##### 去重
+
+查询时使用 distinct 关键字
+
+```mysql
+-- 查询去重
+select distinct * from student;
+```
+
+##### 分页
+
+使用 limit 关键字
+
+```mysql
+-- 分页查询 limit index, length（起始下标，从 0 开始；length 为截取的数据量）
+select * from student limit 10,5;
+```
+
 #### SQL
 
 结构化查询语言（Structured Query Language），主要分为四类
@@ -448,6 +581,62 @@ alter table table_name
   alter table course
       modify id int null;
   ```
+
+#### 视图（View）
+
+视图就是一张虚拟的、专门用来做查询的、自定义展示数据的表
+
+```mysql
+-- 创建视图
+create view view_student as
+select name
+from student;
+
+-- 使用视图
+select *
+from view_student;
+
+-- 删除视图
+drop view view_student;
+```
+
+#### 触发器（Trigger）
+
+触发器定义了一系列操作，可以在执行增删改查操作前后，自动执行一些操作
+
+OLD 表示旧数据，NEW 表示新数据
+
+```mysql
+-- 创建触发器 (删除主表的数据前清空外键) 
+create trigger t_before_delete_on_class
+    before delete
+    on class
+    for each row
+begin
+    update student set student.class_id=null where student.class_id = OLD.id;
+end;
+-- 删除触发器
+drop trigger t_before_delete_on_class;
+```
+
+#### 存储过程（Procedure）
+
+存储过程是一组为了完成特定功能的 SQL 语句集合，存在数据库中供用户直接调用，类似于方法
+
+```mysql
+-- 创建存储过程，可以设置入参和出参
+create procedure add_student(in name varchar(16), out num int)
+begin
+    insert into student(name) values (name);
+    select COUNT(*) into num from student;
+end;
+-- 调用存储过程
+call add_student('新同学', @num);
+-- 获取出参信息
+select @num;
+-- 删除存储过程
+drop procedure add_student;
+```
 
 #### 事务
 
