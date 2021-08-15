@@ -9,4 +9,4 @@ end;
 -- 删除触发器
 drop trigger t_before_delete_on_class;
 
-delete from class where id=3;
+delete from class where id=1;
