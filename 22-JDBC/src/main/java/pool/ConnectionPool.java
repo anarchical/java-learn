@@ -3,7 +3,6 @@ package pool;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,7 +12,6 @@ import java.util.Properties;
  * @author YeYaqiao
  */
 public class ConnectionPool {
-
 
     //读取配置文件
     private static final InputStream INPUT_STREAM = ConnectionPool.class.getResourceAsStream("/druid.properties");

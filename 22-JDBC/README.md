@@ -95,11 +95,138 @@ Transaction，指访问并可能更新数据库中各种数据项的一个程序
 
   持久性 （ACID）：事务处理结束后，对数据的修改是永久的
 
+```java
+package transaction;
 
+import org.apache.commons.dbutils.QueryRunner;
+import pool.ConnectionPool;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+/**
+ * @author YeYaqiao
+ */
+public class Transaction {
+
+    public static void main(String[] args) throws SQLException {
+
+        String sql = "insert into mysql_learn.course(id, name) VALUES (?,?)";
+
+        QueryRunner queryRunner = new QueryRunner();
+        Connection connection = ConnectionPool.getConnection();
+
+        //关闭自动提交，开启事务
+        connection.setAutoCommit(false);
+
+        try {
+            queryRunner.update(connection, sql, 1, "Python 编程思想");
+//            System.out.println(10/0);
+            queryRunner.update(connection, sql, 2, "GoLang 编程思想");
+            connection.commit();
+        }catch (Exception e){
+            e.printStackTrace();
+            //事务回滚
+            connection.rollback();
+        }
+        connection.close();
+    }
+}
+```
 
 #### 连接池
 
+每次与数据库建立连接时，都会消耗 CPU、网络资源
 
+建立一个存放连接信息的缓冲池，避免重复连接数据库，做到资源的重复利用
+
+数据库连接池中会存放一定数量的连接，当连接池中的连接全部都被占用时，请求就会进入等待队列，等待其它线程释放连接
+
+常用的有 Druid 连接池、C3P0 连接池
+
+```java
+public class ConnectionPool {
+
+    //读取配置文件
+    private static final InputStream INPUT_STREAM = ConnectionPool.class.getResourceAsStream("/druid.properties");
+    private static final Properties PROPERTIES = new Properties();
+
+    private static DataSource DATA_SOURCE = null;
+
+    //加载配置文件
+    static {
+        try {
+            PROPERTIES.load(INPUT_STREAM);
+            DATA_SOURCE = DruidDataSourceFactory.createDataSource(PROPERTIES);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //获取连接
+    public static Connection getConnection() {
+        Connection connection = null;
+
+        try {
+            connection = DATA_SOURCE.getConnection();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return connection;
+    }
+}
+```
+
+```properties
+#驱动名称，mysql8以后可以不声明
+driverClassName=com.mysql.cj.jdbc.Driver
+#数据库地址
+url=jdbc:mysql://192.168.173.100:3306
+#用户名
+username=root
+#密码
+password=123456
+#初始化时建立物理连接的个数 默认为0
+initialSize=1
+#最大连接池数量 默认为8
+maxActive=8
+#最小连接池数量
+minIdle=1
+```
+
+#### DBUtils
+
+DBUtils 时 Apache 开源的一个数据工具类
+
+主要核心类有 QueryRunner 查询类、ResultSetHandler 结果处理集类（通过反射将查询到的信息封装成 Java 对象）
+
+BeanHandler 接收单个结果、BeanListHandler 接收结果集
+
+```java
+public class DBUtils {
+
+    public static void main(String[] args) throws SQLException {
+
+        String sqlCourse = "select * from mysql_learn.course";
+
+        String sqlCourseById = "select * from mysql_learn.course where id = ?";
+
+
+        Connection connection = ConnectionPool.getConnection();
+        QueryRunner queryRunner = new QueryRunner();
+
+        //使用 BeanListHandler 接收查询的结果
+        List<Course> courseList = queryRunner.query(connection, sqlCourse, new BeanListHandler<>(Course.class));
+
+        //使用 BeanListHandler 接收查询的结果，并且传入查询参数，底层使用的还是 PreparedStatement 占位符
+        Course course = queryRunner.query(connection, sqlCourseById, new BeanHandler<>(Course.class), 1);
+
+        System.out.println(Arrays.toString(courseList.toArray()));
+        System.out.println(course);
+    }
+}
+```
 
 #### 常见问题
 
