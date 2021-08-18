@@ -16,4 +16,25 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.5</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--让 maven 工程能够读取到 src/main/java 目录下的资源文件，默认只能从 resources 目录下读取-->
+        <!--** 表示任意级目录，* 表示任意文件-->
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
 </project>
