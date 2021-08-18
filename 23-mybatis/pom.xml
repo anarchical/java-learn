@@ -17,10 +17,17 @@
     </properties>
 
     <dependencies>
+        <!--mybatis 依赖-->
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.5.5</version>
+            <version>3.5.7</version>
+        </dependency>
+        <!--mysql 驱动依赖，两者必须配合使用-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.25</version>
         </dependency>
     </dependencies>
 
@@ -35,6 +42,19 @@
                 </includes>
             </resource>
         </resources>
+        <!--IDEA 的 maven 插件默认只支持 jdk11，需要手动声明 jdk8-->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
+
 
 </project>
