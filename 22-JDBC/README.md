@@ -178,6 +178,8 @@ public class ConnectionPool {
 }
 ```
 
+配置文件 resources/druid.properties
+
 ```properties
 #驱动名称，mysql8以后可以不声明
 driverClassName=com.mysql.cj.jdbc.Driver
