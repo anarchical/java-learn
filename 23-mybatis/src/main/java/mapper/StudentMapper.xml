@@ -2,13 +2,36 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 指定所映射的接口-->
+<mapper namespace="mapper.StudentMapper">
 
-<mapper
-        namespace="mapper.StudentMapper">
     <select id="findById" parameterType="int" resultType="entity.Student">
         select *
         from mysql_learn.student
-        where id = #{id}
+        where id = #{id};
     </select>
+
+    <select id="findAll" resultType="entity.Student">
+        select *
+        from mysql_learn.student;
+    </select>
+
+    <select id="save" parameterType="entity.Student">
+        insert into mysql_learn.student
+        values (#{id}, #{name});
+    </select>
+
+    <select id="update" parameterType="entity.Student">
+        update mysql_learn.student
+        set name=#{name}
+        where id = #{id};
+    </select>
+
+    <select id="deleteById" parameterType="java.lang.Integer">
+        delete
+        from mysql_learn.student
+        where id = #{id};
+    </select>
+
 </mapper>
 

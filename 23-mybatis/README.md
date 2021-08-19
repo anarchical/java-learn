@@ -187,9 +187,102 @@ MyBatis 是目前主流的 ORM（Object Relationship Mapping）框架之一；�
 
 #### 自定义接口
 
+原生接口使用起来复杂，耦合度高；通过声明接口， Dao 层与 Service 层解耦；
 
+mybatis 会自动实现接口的内容，无需手动实现
+
+1. 创建映射文件 StudentMapping.xml，同时在 config.xml 中声明
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper
+           PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+           "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!--namespace 指定所映射的接口-->
+   <mapper namespace="mapper.StudentMapper">
+   
+       <select id="findById" parameterType="int" resultType="entity.Student">
+           select *
+           from mysql_learn.student
+           where id = #{id};
+       </select>
+   
+       <select id="findAll" resultType="entity.Student">
+           select *
+           from mysql_learn.student;
+       </select>
+   
+       <select id="save" parameterType="entity.Student">
+           insert into mysql_learn.student
+           values (#{id}, #{name});
+       </select>
+   
+       <select id="update" parameterType="entity.Student">
+           update mysql_learn.student
+           set name=#{name}
+           where id = #{id};
+       </select>
+   
+       <select id="deleteById" parameterType="java.lang.Integer">
+           delete
+           from mysql_learn.student
+           where id = #{id};
+       </select>
+   
+   </mapper>
+   ```
+
+2. 创建接口 StudentMapper，接口的名称需要和 Mapper 映射文件中的 namespace 对应；接口的抽象方法名称需要和 Mapper 映射文件中 `<select>` 标签中的 id 值对应
+
+   ```java
+   public interface StudentMapper {
+   
+       Student findById(int id);
+   
+       List<Student> findAll();
+   
+       void save(Student student);
+   
+       void deleteById(int id);
+   
+       void update(Student student);
+   }
+   ```
+
+3. 获取代理对象，直接调用方法执行 mybatis 底层实现好的 sql
+
+   ```java
+   public class StudentService {
+   
+       public static void main(String[] args) {
+   
+           //加载配置文件 config.xml
+           InputStream inputStream = StudentService.class.getClassLoader().getResourceAsStream("config.xml");
+           SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+           SqlSessionFactory factory = builder.build(inputStream);
+           //开启连接会话
+           SqlSession sqlSession = factory.openSession();
+   
+           //获取接口的实现(获取代理对象)
+           StudentMapper mapper = sqlSession.getMapper(StudentMapper.class);
+   
+           //增删改查
+           mapper.save(new Student(100, "student"));
+           Student student = mapper.findById(100);
+           System.out.println(student);
+   
+           mapper.update(new Student(100, "new Student"));
+           List<Student> studentList = mapper.findAll();
+           System.out.println(studentList);
+   
+           mapper.deleteById(100);
+       }
+   }
+   ```
 
 #### 底层原理
+
+mybatis 通过 xml 配置文件解析（dom 解析）和使用反射的动态代理功能实现了一整套自定义接口功能
 
 
 
