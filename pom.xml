@@ -34,6 +34,7 @@
         <module>50-data-structure</module>
         <module>51-algorithm</module>
         <module>23-mybatis</module>
+        <module>24-hibernate</module>
 
     </modules>
 
