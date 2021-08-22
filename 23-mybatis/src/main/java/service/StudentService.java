@@ -31,6 +31,9 @@ public class StudentService {
         System.out.println(student);
     }
 
+    /**
+     * mybatis 提供的封装接口
+     */
     public static void interfaceUse() {
         //加载配置文件 config.xml
         InputStream inputStream = StudentService.class.getClassLoader().getResourceAsStream("config.xml");
@@ -56,6 +59,7 @@ public class StudentService {
     }
 
     public static void main(String[] args) {
+
 
         //原生使用
         originalUse();

@@ -5,7 +5,7 @@ create database if not exists mysql_learn;
 create table mysql_learn.course
 (
     id   int auto_increment comment 'id唯一标识',
-    name varchar(16) default '课程名',
+    name varchar(32) default '课程名',
     primary key (id)
 ) engine = InnoDB
   default charset = utf8;
@@ -14,7 +14,7 @@ create table mysql_learn.course
 create table mysql_learn.student
 (
     id   int,
-    name varchar(3),
+    name varchar(32),
     primary key (id)
 );
 

@@ -114,7 +114,7 @@ MyBatis 是目前主流的 ORM（Object Relationship Mapping）框架之一；�
    }
    ```
 
-4. 创建映射文件 StudentMapping.xml，同时在 config.xml 中声明
+4. 创建映射文件 StudentMapping.xml，同时在 config.xml 中声明注册
 
    ```xml
    <?xml version="1.0" encoding="UTF-8" ?>
@@ -191,7 +191,7 @@ MyBatis 是目前主流的 ORM（Object Relationship Mapping）框架之一；�
 
 mybatis 会自动实现接口的内容，无需手动实现
 
-1. 创建映射文件 StudentMapping.xml，同时在 config.xml 中声明
+1. 创建映射文件 StudentMapping.xml，同时在 config.xml 中声明注册
 
    ```xml
    <?xml version="1.0" encoding="UTF-8" ?>
@@ -279,6 +279,32 @@ mybatis 会自动实现接口的内容，无需手动实现
        }
    }
    ```
+
+注：当数据库的字段名和所需要映射的实体类的字段名不一样时，则需要声明映射关系
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 指定所映射的接口-->
+<mapper namespace="mapper.StudentMapper">
+
+    <!--当数据库中的 column 名称与实体类中的 属性名不一致时，则需要手动声明指定映射关系 resultMap-->
+    <resultMap id="studentMap" type="entity.Student">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <!--resultMap 需要在查询语句中绑定，替换resultType-->
+    <select id="findById" parameterType="int" resultMap="studentMap">
+        select *
+        from mysql_learn.student
+        where id = #{id};
+    </select>
+
+</mapper>
+```
 
 #### 底层原理
 

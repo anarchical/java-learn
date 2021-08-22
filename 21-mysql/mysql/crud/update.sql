@@ -1,6 +1,8 @@
 -- 新增字段
 alter table mysql_learn.course
     add teacher varchar(10);
+alter table student
+    add class_id int;
 -- 修改字段
 alter table mysql_learn.course
     modify teacher varchar(5);
@@ -29,3 +31,7 @@ alter table course
 -- 设置默认值
 alter table course
     alter column name set default 'course_name';
+
+-- 修改表字段属性
+alter table course modify name varchar(32);
+alter table student modify name varchar(32);

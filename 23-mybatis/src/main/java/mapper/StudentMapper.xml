@@ -5,7 +5,14 @@
 <!--namespace 指定所映射的接口-->
 <mapper namespace="mapper.StudentMapper">
 
-    <select id="findById" parameterType="int" resultType="entity.Student">
+    <!--当数据库中的 column 名称与实体类中的 属性名不一致时，则需要手动声明指定映射关系 resultMap-->
+    <resultMap id="studentMap" type="entity.Student">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <!--resultMap 需要在查询语句中绑定，替换resultType-->
+    <select id="findById" parameterType="int" resultMap="studentMap">
         select *
         from mysql_learn.student
         where id = #{id};
@@ -17,7 +24,7 @@
     </select>
 
     <select id="save" parameterType="entity.Student">
-        insert into mysql_learn.student
+        insert into mysql_learn.student(id, name)
         values (#{id}, #{name});
     </select>
 
