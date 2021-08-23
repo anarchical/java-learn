@@ -10,7 +10,8 @@ public class StudentService {
 
     public static void main(String[] args) {
         MyBatis myBatis=new MyBatis();
-        StudentMapper studentMapper = (StudentMapper) myBatis.getInstance(StudentMapper.class);
+        String configPath="23-mybatis/src/main/resources/config.xml";
+        StudentMapper studentMapper =  myBatis.getInstance(StudentMapper.class,configPath);
         studentMapper.test();
     }
 }
