@@ -15,7 +15,9 @@ create table mysql_learn.student
 (
     id   int,
     name varchar(32),
-    primary key (id)
+    teacher_id int,
+    primary key (id),
+    foreign key (teacher_id) references class(id)
 );
 
 -- 插入数据
@@ -27,3 +29,11 @@ values ('Java 程序设计');
 
 insert into mysql_learn.course(name)
 values ('MySQL 数据库');
+
+-- 创建老师表 teacher
+create table mysql_learn.teacher
+(
+    id   int,
+    name varchar(32),
+    primary key (id)
+);

@@ -22,5 +22,4 @@ public interface StudentMapper {
 
     void update(Student student);
 
-    void test();
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 指定所映射的接口-->
+<mapper namespace="mapper.ClientMapper">
+
+    <resultMap id="clientMap" type="entity.Client">
+        <id column="cid" property="id"/>
+        <result column="cname" property="name"/>
+        <collection property="orders" ofType="entity.Order">
+            <id column="oid" property="id"/>
+            <result column="oname" property="name"/>
+        </collection>
+    </resultMap>
+
+    <select id="findById" parameterType="java.lang.Integer" resultMap="clientMap">
+        select client.id cid, client.name cname, orders.id oid, orders.name oname
+        from mysql_learn.client client,
+             mysql_learn.orders orders
+        where client.id = #{id}
+          and orders.client_id = client.id;
+    </select>
+
+</mapper>

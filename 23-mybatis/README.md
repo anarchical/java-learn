@@ -310,6 +310,43 @@ mybatis 会自动实现接口的内容，无需手动实现
 
 mybatis 通过 xml 配置文件解析（dom 解析）和使用反射的动态代理功能实现了一整套自定义接口功能
 
+#### 使用详解
+
+##### 多表关联查询
+
+1. 一对多
+
+   一方
+
+   ```java
+   @Data
+   public class Client {
+       private Integer id;
+       private String name;
+       private List<Order> orders;
+   }
+   ```
+
+   多方
+
+   ```java
+   @Data
+   public class Order {
+       private Integer id;
+       private String name;
+       private Client client;
+       //private List<Commodity> commodities;
+   }
+   ```
+
+   
+
+2. 多对多
+
+   
+
+
+
 
 
 #### 常见问题
