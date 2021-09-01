@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.OrderMapper">
+
+    <!--    <resultMap id="orderMap" type="entity.Order">-->
+    <!--        <id column="oid" property="id"/>-->
+    <!--        <result column="oname" property="name"/>-->
+    <!--        &lt;!&ndash;一对一关系&ndash;&gt;-->
+    <!--        <association property="client" javaType="entity.Client">-->
+    <!--            <id column="cid" property="id"/>-->
+    <!--            <result column="cname" property="name"/>-->
+    <!--        </association>-->
+    <!--    </resultMap>-->
+
+    <!--懒加载写法-->
+    <resultMap id="orderMap" type="entity.Order">
+        <id column="oid" property="id"/>
+        <result column="oname" property="name"/>
+        <!--一对一关系-->
+        <association property="client" javaType="entity.Client" select="mapper.ClientMapper.findById"
+                     column="client_id"/>
+    </resultMap>
+
+    <resultMap id="orderCommoditiesMap" type="entity.Order">
+        <id column="oid" property="id"/>
+        <result column="oname" property="name"/>
+        <collection property="commodities" ofType="entity.Commodity">
+            <id column="cid" property="id"/>
+            <result column="cname" property="name"/>
+        </collection>
+    </resultMap>
+
+    <!--    <select id="findOrderAndClientByOrderId" parameterType="java.lang.Integer" resultMap="orderMap">-->
+    <!--        select client.id cid, client.name cname, orders.id oid, orders.name oname-->
+    <!--        from mysql_learn.client client,-->
+    <!--             mysql_learn.orders orders-->
+    <!--        where orders.id = #{id}-->
+    <!--          and orders.client_id = client.id;-->
+    <!--    </select>-->
+    <!--懒加载写法-->
+    <select id="findOrderAndClientByOrderId" parameterType="java.lang.Integer" resultMap="orderMap">
+        select orders.id oid, orders.name oname, orders.client_id
+        from mysql_learn.orders orders
+        where orders.id = #{id}
+    </select>
+
+    <select id="findAll" parameterType="java.lang.Integer" resultMap="orderMap">
+        select client.id cid, client.name cname, orders.id oid, orders.name oname
+        from mysql_learn.client client,
+             mysql_learn.orders orders
+        where orders.client_id = client.id;
+    </select>
+
+<!--    <select id="findCommoditiesByOrderId" parameterType="java.lang.Integer" resultMap="orderCommoditiesMap">-->
+<!--        select orders.id oid, orders.name oname, commodity.id cid, commodity.name cname-->
+<!--        from mysql_learn.commodity commodity,-->
+<!--             mysql_learn.orders orders,-->
+<!--             mysql_learn.commodity_order co-->
+<!--        where orders.id = co.order_id-->
+<!--          and commodity.id = co.commodity_id-->
+<!--          and orders.id = #{id};-->
+<!--    </select>-->
+
+</mapper>

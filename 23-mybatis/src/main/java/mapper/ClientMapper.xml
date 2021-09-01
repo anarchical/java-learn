@@ -5,6 +5,8 @@
 <!--namespace 指定所映射的接口-->
 <mapper namespace="mapper.ClientMapper">
 
+    <cache/>
+
     <resultMap id="clientMap" type="entity.Client">
         <id column="cid" property="id"/>
         <result column="cname" property="name"/>

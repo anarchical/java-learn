@@ -12,5 +12,6 @@ import java.util.List;
 public class Order {
     private Integer id;
     private String name;
-//    private List<Commodity> commodities;
+    private Client client;
+    private List<Commodity> commodities;
 }

@@ -312,9 +312,42 @@ mybatis 通过 xml 配置文件解析（dom 解析）和使用反射的动态代
 
 #### 使用详解
 
+
+
 ##### 多表关联查询
 
-1. 一对多
+1. 一对一查询
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper
+           PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+           "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <mapper namespace="mapper.OrderMapper">
+   
+       <resultMap id="orderMap" type="entity.Order">
+           <id column="oid" property="id"/>
+           <result column="oname" property="name"/>
+           <!--一对一关系-->
+           <association property="client" javaType="entity.Client">
+               <id column="cid" property="id"/>
+               <result column="cname" property="name"/>
+           </association>
+       </resultMap>
+   
+   
+       <select id="findOrderAndClientByOrderId" parameterType="java.lang.Integer" resultMap="orderMap">
+           select client.id cid, client.name cname, orders.id oid, orders.name oname
+           from mysql_learn.client client,
+                mysql_learn.orders orders
+           where orders.id = #{id}
+             and orders.client_id = client.id;
+       </select>
+   
+   </mapper>
+   ```
+
+2. 一对多
 
    一方
 
@@ -335,19 +368,183 @@ mybatis 通过 xml 配置文件解析（dom 解析）和使用反射的动态代
        private Integer id;
        private String name;
        private Client client;
-       //private List<Commodity> commodities;
    }
    ```
 
+   映射文件
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper
+           PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+           "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!--namespace 指定所映射的接口-->
+   <mapper namespace="mapper.ClientMapper">
    
-
-2. 多对多
-
+       <resultMap id="clientMap" type="entity.Client">
+           <id column="cid" property="id"/>
+           <result column="cname" property="name"/>
+           <collection property="orders" ofType="entity.Order">
+               <id column="oid" property="id"/>
+               <result column="oname" property="name"/>
+           </collection>
+       </resultMap>
    
+       <select id="findById" parameterType="java.lang.Integer" resultMap="clientMap">
+           select client.id cid, client.name cname, orders.id oid, orders.name oname
+           from mysql_learn.client client,
+                mysql_learn.orders orders
+           where client.id = #{id}
+             and orders.client_id = client.id;
+       </select>
+   
+   </mapper>
+   ```
 
 
+#### 延迟加载
 
+延迟加载（懒加载）将某写查询操作滞后，尽量减少 SQL 的执行，提高性能
 
+延迟加载只存在于级联查询中，单表查询没有延迟加载的功能
+
+开启延迟加载设置
+
+```xml
+    <settings>
+        <!--设置控制台打印 sql-->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <!--开区延迟加载-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+    </settings>
+```
+
+延迟加载功能的映射文件
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.OrderMapper">
+
+    <!--懒加载写法-->
+    <resultMap id="orderMap" type="entity.Order">
+        <id column="oid" property="id"/>
+        <result column="oname" property="name"/>
+        <!--一对一关系-->
+        <association property="client" javaType="entity.Client" select="mapper.ClientMapper.findById"
+                     column="client_id"/>
+    </resultMap>
+
+    <!--懒加载写法-->
+    <select id="findOrderAndClientByOrderId" parameterType="java.lang.Integer" resultMap="orderMap">
+        select orders.id oid, orders.name oname, orders.client_id
+        from mysql_learn.orders orders
+        where orders.id = #{id}
+    </select>
+
+</mapper>
+```
+
+```java
+        //只执行一条 SQL
+				Order order = mapper.findOrderAndClientByOrderId(2);
+        System.out.println(order.getName());
+				//执行两条 SQL
+				Order order = mapper.findOrderAndClientByOrderId(2);
+        System.out.println(order.getClient().getName());
+```
+
+#### 缓存机制
+
+缓存机制可以解决单表查询时的性能问题
+
+通过缓存机制可以使得 Java 程序与数据库进行尽量少的交互，提高运行性能。
+
+当 MyBatis 查询出结果后，会自动将其存入缓存中，下一次查询则直接访问缓存，而不是数据库，从而提升性能；
+
+当执行增删改等操作时，删除缓存，从而保证数据的时效性
+
+##### 一级缓存
+
+MyBatis 默认自带一级缓存且无法关闭
+
+一级缓存的数据存储在 SqlSession 中，同一个 SqlSession 中所缓存查询结果被共享，不同之间的 SqlSession 中的缓存结果不能被互相访问
+
+##### 二级缓存
+
+二级缓存的作用域为一个 Mapper，当多个 SqlSession 使用同一个 Mapper 时，可以共享其中的缓存数据
+
+二级缓存可以配置回收策略、缓存数量、定时清楚缓存等相关配置
+
+配置文件中开启二级缓存
+
+```xml
+        <!--开启二级缓存-->
+        <setting name="cacheEnabled" value="true"/>
+```
+
+Mapper.xml 映射文件中配置二级缓存
+
+```xml
+    <cache/>
+```
+
+使用场景：
+
+* 当多个 namespace 去操作一个表，有的执行了新增操作刷新的缓存，但是有的没有，就会出现脏读的情况，此时需要开启二级缓存 使用 cache-ref 来共享缓存数据
+* 二级缓存适用于读操作多的应用
+
+注意：当事务被提交或者 session 被关闭时，相关数据才能被加载进二级缓存
+
+#### 动态 SQL
+
+当业务中存在大量相同的 SQL 时，SQL 语句的复用性很差，则可以通过动态 SQL 来实现解耦
+
+以下 SQL 相同部分过多
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.UserMapper">
+
+    <select id="findByUser" resultType="com.domain.User">
+        select * from user where id = #{id} and username = #{username}
+    </select>
+
+    <select id="findByUser2" resultType="com.domain.User">
+        select * from user where password = #{password} and username = #{username}
+    </select>
+
+    <select id="findByUser3" resultType="com.domain.User">
+        select * from user where password = #{password} and age = #{age}
+    </select>
+
+</mapper>
+```
+
+优化
+
+```xml
+<select id="findByUser" resultType="com.domain.User">
+    select * from user
+    <where>
+        <if test="id != null">
+            id = #{id}
+        </if>
+        <if test="username != null">
+            and username = #{username}
+        </if>
+        <if test="password != null">
+            and password = #{password}
+        </if>
+        <if test="age != null">
+            and age = #{age}
+        </if>
+    </where>
+</select>
+```
 
 #### 常见问题
 
