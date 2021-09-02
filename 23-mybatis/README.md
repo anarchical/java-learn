@@ -509,15 +509,15 @@ Mapper.xml 映射文件中配置二级缓存
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mapper.UserMapper">
 
-    <select id="findByUser" resultType="com.domain.User">
+    <select id="findByUser" resultType="com.domain.com.leaf.User">
         select * from user where id = #{id} and username = #{username}
     </select>
 
-    <select id="findByUser2" resultType="com.domain.User">
+    <select id="findByUser2" resultType="com.domain.com.leaf.User">
         select * from user where password = #{password} and username = #{username}
     </select>
 
-    <select id="findByUser3" resultType="com.domain.User">
+    <select id="findByUser3" resultType="com.domain.com.leaf.User">
         select * from user where password = #{password} and age = #{age}
     </select>
 
@@ -527,7 +527,7 @@ Mapper.xml 映射文件中配置二级缓存
 优化
 
 ```xml
-<select id="findByUser" resultType="com.domain.User">
+<select id="findByUser" resultType="com.domain.com.leaf.User">
     select * from user
     <where>
         <if test="id != null">

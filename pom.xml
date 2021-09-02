@@ -35,6 +35,7 @@
         <module>51-algorithm</module>
         <module>23-mybatis</module>
         <module>24-hibernate</module>
+        <module>30-spring</module>
 
     </modules>
 
