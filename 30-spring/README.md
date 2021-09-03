@@ -184,7 +184,128 @@ public class Spring {
 
 #### AOP
 
-AOP（Aspect Oriented Programming）面向切片编程
+AOP（Aspect Oriented Programming）面向切面编程
 
+AOP 是对 OOP 的一个补充，具体指在程序运行的过程中动态的将非业务代码（如日志打印，）切入到业务代码中，实现解耦；通过将非业务内容抽象成一个对象，面向该对象编程
 
+* 优点
+
+  降低模块之间的耦合、提高代码的维护性，提高代码复用性、将业务代码和非业务代码分离，使逻辑清晰
+
+AOP 底层基于动态代理实现，委托类执行业务，代理类执行非业务逻辑
+
+xml 配置
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+    <context:component-scan base-package="aop"/>
+    <aop:aspectj-autoproxy/>
+
+</beans>
+```
+
+业务代码
+
+```java
+package aop;
+
+import org.springframework.stereotype.Component;
+
+/**
+ * @author YeYaqiao
+ */
+@Component
+public class Method {
+
+    public String add(){
+        System.out.println("add");
+        return "add";
+    }
+
+    public void sub(Integer num1,Integer num2){
+        System.out.println("sub");
+        System.out.println(num1+num2);
+    }
+
+}
+```
+
+非业务代码（切面类）
+
+```java
+package aop;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+
+/**
+ * @author YeYaqiao
+ */
+@Aspect
+@Component
+public class MyAspect {
+
+    //方法用参数可以用占位符替代
+    @After("execution(public void aop.Method.sub(..))")
+    public void after(JoinPoint joinPoint){
+
+        System.out.println("后执行");
+        System.out.println("方法名："+joinPoint.getSignature().getName());
+        System.out.println("方法参数："+ Arrays.toString(joinPoint.getArgs()));
+    }
+
+    @Before("execution(public void aop.Method.add())")
+    public void before(JoinPoint joinPoint){
+
+        System.out.println("先执行");
+    }
+
+    //
+    @AfterReturning(value = "execution(public void aop.Method.add())",returning = "result")
+    public void after(JoinPoint joinPoint,Object result){
+        System.out.println(joinPoint);
+        System.out.println("结果是："+result);
+    }
+}
+
+```
+
+运行类
+
+```java
+package aop;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+/**
+ * @author YeYaqiao
+ */
+public class Aop {
+    public static void main(String[] args) {
+        ApplicationContext applicationContext=new ClassPathXmlApplicationContext("aop.xml");
+        Method bean = applicationContext.getBean(Method.class);
+        System.out.println(bean.add());
+        bean.sub(1,2);
+
+    }
+}
+```
 
