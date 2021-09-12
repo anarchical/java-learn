@@ -209,3 +209,8 @@ Expression Language 表达式语言
 注：若 EL 表达式不生效，则需要声明开启使用 `<%@ page isELIgnored="false"%>`
 
 #### 常见问题
+
+1. 新建的 JavaWeb 工程为什么默认可以访问 index.jsp 页面？
+
+   Tomcat 启动时，会先去读取 Tomcat 自带的 web.xml，其次再读取项目中的 web.xml；其中 Tomcat 中的 web.xml 的 `<welcome-file-list>` 中定义了访问 context 时默认展示的首页 index.jsp；我们可以在项目中的 web.xml 重写此标签改变访问 context 时的首页页面
+

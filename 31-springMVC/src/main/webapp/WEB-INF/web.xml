@@ -3,6 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
+    <!--重写访问的首页为 newIndex.jsp-->
+    <welcome-file-list>
+        <welcome-file>newIndex.jsp</welcome-file>
+    </welcome-file-list>
+
     <!--配置前端控制器 servlet，对浏览器发送的请求进行统一处理-->
     <servlet>
         <servlet-name>SpringMVC</servlet-name>
@@ -10,11 +15,17 @@
         <!--SpringMVC配置文件的位置和名称-->
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:springMVC.xml</param-value>
+            <param-value>classpath:spring/springMVC.xml</param-value>
         </init-param>
         <!--将前端控制器初始化时间提前到服务器启动时-->
         <load-on-startup>1</load-on-startup>
     </servlet>
+
+    <servlet>
+        <servlet-name>MyServlet</servlet-name>
+        <servlet-class>servlet.MyServlet</servlet-class>
+    </servlet>
+
 
     <!--设置 springMVC 的核心控制器所能处理的请求的路径-->
     <!--/ 表示所匹配的请求可以是 /login 或 .html .js .css 方式的请求路径-->
@@ -22,5 +33,10 @@
     <servlet-mapping>
         <servlet-name>SpringMVC</servlet-name>
         <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>MyServlet</servlet-name>
+        <url-pattern>/servlet</url-pattern>
     </servlet-mapping>
 </web-app>

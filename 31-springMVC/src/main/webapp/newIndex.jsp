@@ -2,16 +2,15 @@
   Created by IntelliJ IDEA.
   User: maqianhui
   Date: 2021/9/12，第38周
-  Time: 21:08
+  Time: 20:47
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>ModelAndView</title>
+    <title>newIndex</title>
 </head>
 <body>
-<h1>ModelAndView</h1>
-<h2>${model}</h2>
+<h1>New Index</h1>
 </body>
 </html>

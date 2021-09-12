@@ -9,7 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author YeYaqiao
  */
 @Controller
-public class MyController {
+public class MvcController {
 
     //配置视图解析器对应的地址（纯视图）
     //当有返回值时，以返回值拼接成的视图名为主
@@ -27,7 +27,7 @@ public class MyController {
         //设置对应的视图名称，通过配置文件补齐后缀
         modelAndView.setViewName("modelAndView");
         //设置数据模型
-        modelAndView.addObject("model", "model");
+        modelAndView.addObject("model", "modelValue");
         return modelAndView;
     }
 
