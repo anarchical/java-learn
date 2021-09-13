@@ -1,0 +1,17 @@
+### 首页
+GET localhost:8888/context
+
+### 获取JSON数据
+GET localhost:8888/context/user
+
+### 返回请求体获取日期
+GET localhost:8888/context/send_user
+Content-Type: application/json
+
+{
+  "id": "123",
+  "name": "asd"
+}
+
+### 自定义转换日期
+GET localhost:8888/context/date?date=2021-09-14

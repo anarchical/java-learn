@@ -1,9 +1,11 @@
 package controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import vo.UserVO;
+
+import java.util.Date;
 
 /**
  * @author YeYaqiao
@@ -17,7 +19,7 @@ public class MvcController {
     @RequestMapping("/view")
     public String view() {
         System.out.println("执行了 view 方法");
-        return  "view";
+        return "view";
     }
 
     //配置视图解析器对应的地址（视图和数据）
@@ -36,6 +38,27 @@ public class MvcController {
     @ResponseBody
     public String model() {
         return "model";
+    }
+
+    //通过配置文件配置将对象解析成json
+    @ResponseBody
+    @RequestMapping("/user")
+    public UserVO getUserVO() {
+        return new UserVO(1, "张三");
+    }
+
+    @GetMapping("/send_user")
+    @ResponseBody
+    public UserVO transUserVO(@RequestBody UserVO userVO) {
+        System.out.println(userVO);
+        return userVO;
+    }
+
+    @RequestMapping("/date")
+    @ResponseBody
+    public String date(@RequestParam("date") Date date) {
+        System.out.println(date);
+        return date.toString();
     }
 
 }
