@@ -39,3 +39,13 @@ Spring Web MVC 是 Spring 框架用来提供 Web 服务的组件，基于 Servle
 
 #### 数据校验
 
+数据校验主要有两种形式
+
+* 实现 Validator 接口
+* 使用 Annotation JSR-303 标准，使用注解
+
+##### 实现 Validator 接口
+
+
+
+##### 基于注解

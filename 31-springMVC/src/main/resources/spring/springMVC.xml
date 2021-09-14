@@ -20,8 +20,8 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!--配置json解析-->
-    <mvc:annotation-driven conversion-service="conversionService">
+    <!--配置-->
+    <mvc:annotation-driven conversion-service="conversionService" validator="mvcValidator">
         <mvc:message-converters>
             <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
                 <!--配置字符集，防止中文乱码-->
@@ -31,9 +31,7 @@
                     </list>
                 </property>
             </bean>
-
         </mvc:message-converters>
-
     </mvc:annotation-driven>
 
     <!--配置日期转换器-->
@@ -45,4 +43,6 @@
         </property>
     </bean>
 
+    <!--配置数据校验器-->
+    <bean id="mvcValidator" class="validator.MvcValidator"/>
 </beans>

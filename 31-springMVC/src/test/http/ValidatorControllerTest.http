@@ -1,0 +1,16 @@
+###
+GET localhost:8888/context/validator/validation
+Content-Type: application/json
+
+{
+  "id": "123",
+  "name": "asd"
+}
+###
+GET localhost:8888/context/validator/valid
+Content-Type: application/json
+
+{
+  "id": "123",
+  "name": "123"
+}
