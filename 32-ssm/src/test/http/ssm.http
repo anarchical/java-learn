@@ -1,0 +1,4 @@
+### 获取所有学生信息
+GET localhost:8888/context/student/list
+### test
+GET localhost:8888/context/student/test

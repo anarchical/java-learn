@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace 指定所映射的接口-->
+<mapper namespace="repository.StudentMapper">
+
+    <!--当数据库中的 column 名称与实体类中的 属性名不一致时，则需要手动声明指定映射关系 resultMap-->
+    <resultMap id="studentMap" type="entity.Student">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <!--resultMap 需要在查询语句中绑定，替换resultType-->
+    <select id="findById" parameterType="java.lang.Integer" resultMap="studentMap" resultType="entity.Student">
+        select *
+        from mysql_learn.student
+        where id = #{id};
+    </select>
+
+    <select id="findAll" resultType="entity.Student">
+        select *
+        from mysql_learn.student;
+    </select>
+
+    <select id="save" parameterType="entity.Student">
+        insert into mysql_learn.student(id, name)
+        values (#{id}, #{name});
+    </select>
+
+    <select id="update" parameterType="entity.Student">
+        update mysql_learn.student
+        set name=#{name}
+        where id = #{id};
+    </select>
+
+    <select id="deleteById" parameterType="java.lang.Integer">
+        delete
+        from mysql_learn.student
+        where id = #{id};
+    </select>
+
+</mapper>
+
