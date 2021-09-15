@@ -37,6 +37,7 @@
         <module>24-hibernate</module>
         <module>30-spring</module>
         <module>31-springMVC</module>
+        <module>32-ssm</module>
 
     </modules>
 

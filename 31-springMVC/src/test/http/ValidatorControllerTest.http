@@ -1,4 +1,4 @@
-###
+### 实现 Validator 接口
 GET localhost:8888/context/validator/validation
 Content-Type: application/json
 
@@ -6,11 +6,11 @@ Content-Type: application/json
   "id": "123",
   "name": "asd"
 }
-###
+### 使用注解
 GET localhost:8888/context/validator/valid
 Content-Type: application/json
 
 {
   "id": "123",
-  "name": "123"
+  "name": ""
 }
