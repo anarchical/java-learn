@@ -1,0 +1,6 @@
+### 获取所有学生信息
+GET localhost:8888/student/list
+### view
+GET localhost:8888/view/getView
+### modelAndView
+GET localhost:8888/view/mode_and_view
