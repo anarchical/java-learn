@@ -35,13 +35,14 @@ class Dog {
 }
 ```
 
-同一个类的 Class 类对象只有一个，因为内存中每个运行时类只有一个，其常用方法有：
+同一个类的 Class 类对象只有一个，因为内存中每个运行时类只有一个，可以通过四种方法获取：
 
 | 方法名                    | 作用                       |
 | ------------------------- | -------------------------- |
-| forName(String className) | 通过全类名获取类型信息对象 |
-|                           |                            |
-|                           |                            |
+| Class.forName(String className) | 通过全类名获取类型信息对象 |
+| TargetObject.Class | 知道具体类的情况下 |
+| new TargetObject.getClass() | 通过实例对象获取 |
+| ClassLoader.loadClass(String className) | 通过类加载器获取获取 |
 
 #### 代理模式
 
