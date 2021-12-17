@@ -47,6 +47,7 @@
         <module>31-springMVC</module>
         <module>32-ssm</module>
         <module>33-springboot</module>
+        <module>25-ElasticSearch</module>
 
     </modules>
 

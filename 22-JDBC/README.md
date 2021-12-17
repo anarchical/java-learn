@@ -232,3 +232,6 @@ public class DBUtils {
 
 #### 常见问题
 
+1. 常见的MySQL存储引擎？
+   * InnoDB：
+   * MyISAM：
