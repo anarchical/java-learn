@@ -1,12 +1,10 @@
-package index;
-
+package doc;
 
 /**
  * @author YeYaqiao
  */
-public class IndexCreate {
+public class DocUpdate {
 
-    //创建索引
     public static void main(String[] args) {
 
     }

@@ -1,12 +1,9 @@
-package index;
-
+package doc;
 
 /**
  * @author YeYaqiao
  */
-public class IndexCreate {
-
-    //创建索引
+public class DocDelete {
     public static void main(String[] args) {
 
     }

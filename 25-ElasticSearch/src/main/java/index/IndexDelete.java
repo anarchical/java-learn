@@ -1,12 +1,10 @@
 package index;
 
-
 /**
  * @author YeYaqiao
+ * 索引删除
  */
-public class IndexCreate {
-
-    //创建索引
+public class IndexDelete {
     public static void main(String[] args) {
 
     }
